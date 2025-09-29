@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cavendish University Registration Portal</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #1a237e; /* A deep blue for the university theme */
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 2em;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #3f51b5; /* A primary blue */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .button:hover {
+            background-color: #303f9f; /* A darker blue on hover */
+            transform: translateY(-2px);
+        }
+
+        .admin-button {
+            background-color: #4caf50; /* A green for the admin button */
+        }
+
+        .admin-button:hover {
+            background-color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Cavendish University</h1>
+        <p>Please select your role to proceed to the registration portal.</p>
+        <div class="button-group">
+            <!-- Updated links: go to login first -->
+            <a href="{{ url_for('student.student_login') }}" class="button">Student Portal</a>
+            <a href="{{ url_for('admin.admin_login') }}" class="button admin-button">Admin Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

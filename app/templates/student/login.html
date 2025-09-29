@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Student Login{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg p-4">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Student Login</h2>
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('student.student_login') }}">
+                        <div class="mb-3">
+                            <label for="student_number" class="form-label">Student Number</label>
+                            <input 
+                                type="text" 
+                                id="student_number" 
+                                name="student_number" 
+                                class="form-control" 
+                                placeholder="e.g., CUN-2022-001" 
+                                aria-describedby="studentNumberHelp" 
+                                required
+                            >
+                            <div id="studentNumberHelp" class="form-text">
+                                Please enter your official student number.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-control" 
+                                placeholder="Enter your password" 
+                                required
+                            >
+                        </div>
+                        
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                        </div>
+
+                        <div class="text-center">
+                            <a href="{{ url_for('student.student_forgot_password) }}" class="text-decoration-none">Forgot Password?</a>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <p class="text-center">
+                        Don’t have an account? <a href="{{ url_for('student.student_signup') }}">Sign Up</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

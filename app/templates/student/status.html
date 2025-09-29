@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Status</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            color: #1a237e;
+            font-size: 2em;
+            margin-bottom: 1.5em;
+        }
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        .styled-table thead tr {
+            background-color: #1a237e;
+            color: #ffffff;
+            text-align: left;
+            font-weight: bold;
+        }
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+        }
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid #1a237e;
+        }
+        .styled-table tbody tr:hover {
+            background-color: #f1f1f1;
+            transition: background-color 0.3s ease;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #fff;
+        }
+        .status-badge.pending {
+            background-color: #ff9800; /* Orange */
+        }
+        .status-badge.approved {
+            background-color: #4caf50; /* Green */
+        }
+        .status-badge.rejected {
+            background-color: #f44336; /* Red */
+        }
+        .no-payments {
+            padding: 20px;
+            color: #888;
+            font-style: italic;
+        }
+        .btn-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            font-size: 1em;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #3f51b5;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-link:hover {
+            background-color: #303f9f;
+        }
+        .action-btn {
+            padding: 8px 15px;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            margin-left: 10px; /* Add some space */
+        }
+        .action-btn.delete {
+            background-color: #f44336;
+        }
+        .action-btn.delete:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Your Payment Status</h2>
+        {% if payments %}
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>File</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                        <tr>
+                            <td>{{ payment.student.name }}</td>
+                            <td>{{ payment.slip_filename }}</td>
+                            <td>
+                                {% if payment.status == 'Approved' %}
+                                    <span class="status-badge approved">Approved</span>
+                                {% elif payment.status == 'Pending' %}
+                                    <span class="status-badge pending">Pending</span>
+                                {% else %}
+                                    <span class="status-badge rejected">Rejected</span>
+                                {% endif %}
+                                
+                                <form action="{{ url_for('student.delete_payment', payment_id=payment.id) }}" method="POST" style="display:inline-block;">
+                                    <button type="submit" class="action-btn delete">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="no-payments">No payments found. Please upload a payment slip.</div>
+        {% endif %}
+        <a href="{{ url_for('student.upload_payment') }}" class="btn-link">Upload New Payment</a>
+    </div>
+</body>
+</html>
