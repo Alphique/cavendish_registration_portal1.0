@@ -89,8 +89,9 @@
         .university-logo {
             height: 60px;
             width: auto;
-            filter: brightness(0) invert(1);
+            /* Remove filter properties that were causing white overlay */
             transition: all 0.3s ease;
+            border-radius: 8px;
         }
 
         .university-logo:hover {
@@ -188,7 +189,8 @@
             height: 80px;
             width: auto;
             margin-bottom: 1rem;
-            filter: brightness(0) invert(1);
+            /* Remove filter properties */
+            border-radius: 8px;
         }
 
         .hero-title {
@@ -391,6 +393,20 @@
             width: auto;
             margin-bottom: 1rem;
             opacity: 0.7;
+            /* Remove filter for footer logo too */
+        }
+
+        /* If logo still has white background, add these styles */
+        .logo-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Alternative: If logo has transparent background but still shows white */
+        .logo-fix {
+            mix-blend-mode: multiply;
         }
 
         /* Responsive Design */
@@ -480,10 +496,12 @@
         <header class="main-header">
             <div class="header-content">
                 <div class="logo-section">
-                    <img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Cavendish University Logo" class="university-logo">
+                    <div class="logo-container">
+                        <img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Cavendish University Logo" class="university-logo logo-fix">
+                    </div>
                     <div class="university-title">
                         <h1>Cavendish University</h1>
-                        <p class="tagline">Excellence in Education</p>
+                        <p class="tagline">SCHOOL OF MEDICINE</p>
                     </div>
                 </div>
                 <nav class="nav-links">
@@ -498,7 +516,9 @@
         <main class="main-content">
             <div class="hero-card">
                 <div class="hero-header">
-                    <img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Cavendish University Logo" class="hero-logo">
+                    <div class="logo-container">
+                        <img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Cavendish University Logo" class="hero-logo logo-fix">
+                    </div>
                     <h1 class="hero-title">Registration Portal</h1>
                     <p class="hero-subtitle">Your Gateway to Academic Excellence</p>
                 </div>
@@ -522,7 +542,7 @@
                             <p>Access your academic records, upload payment documents, check registration status, and manage your student profile.</p>
                             <a href="{{ url_for('student.student_login') }}" class="btn-portal btn-student">
                                 <span>Enter Student Portal</span>
-                                <svg xmlns="http://www.w3.org2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
                                 </svg>
                             </a>
