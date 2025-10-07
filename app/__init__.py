@@ -1,3 +1,4 @@
+#app/__init__.py
 from flask import Flask, render_template  # <-- added render_template
 from .config import Config
 from .extensions import db, migrate

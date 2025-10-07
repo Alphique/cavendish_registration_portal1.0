@@ -1,72 +1,318 @@
 {% extends "base.html" %}
 
-{% block title %}Student Login{% endblock %}
+{% block title %}Student Login - Cavendish University{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow-lg p-4">
-                <div class="card-body">
-                    <h2 class="card-title text-center mb-4">Student Login</h2>
-                    
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
 
-                    <form method="POST" action="{{ url_for('student.student_login') }}">
-                        <div class="mb-3">
-                            <label for="student_number" class="form-label">Student Number</label>
-                            <input 
-                                type="text" 
-                                id="student_number" 
-                                name="student_number" 
-                                class="form-control" 
-                                placeholder="e.g., CUN-2022-001" 
-                                aria-describedby="studentNumberHelp" 
-                                required
-                            >
-                            <div id="studentNumberHelp" class="form-text">
-                                Please enter your official student number.
-                            </div>
-                        </div>
+<!-- NEW: Floating Utility Bar (Top Right Corner) -->
+<div class="login-utility-bar d-none d-lg-block">
+    <div class="dropdown">
+        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical me-1" viewBox="0 0 16 16">
+              <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+            </svg>
+            Utilities
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+            <li>
+                <a class="dropdown-item" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shield-lock me-2 text-warning" viewBox="0 0 16 16">
+                        <path d="M5.338 1.59a.85.85 0 0 0-1.399-.175L.16 8.525a1.26 1.26 0 0 0-.25 1.026c.1.472.45.895.96.895h.711a.75.75 0 0 1 .5.123.743.743 0 0 0 .584.058c.27-.101.483-.242.66-.403l.635-.678a1 1 0 0 1 .802-.345h.19c.47 0 .864.33 1.037.76l.175.45c.094.241.168.513.265.758.118.286.277.561.432.793l.019.034a.75.75 0 0 1-.362.909l-.178.077a.75.75 0 0 0-.46.33L8 15.016l3.37-2.671a.75.75 0 0 0-.362-.909l-.178-.077a.75.75 0 0 1-.46-.33l-.019-.034c-.155-.232-.314-.507-.432-.793a4.015 4.015 0 0 0-.66-.403c-.177-.161-.39-.302-.66-.403a.743.743 0 0 0-.584-.058.75.75 0 0 1-.5-.123H6.711a.998.998 0 0 0-.96-.895c-.51 0-.86.423-.96.895a1.26 1.26 0 0 0-.25 1.026l-3.37 5.016a1.26 1.26 0 0 0-.25 1.026c.1.472.45.895.96.895h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566a1.13 1.13 0 0 0-1.96 0z"/>
+                    </svg>
+                    Admin Login
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus me-2 text-success" viewBox="0 0 16 16">
+                        <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                        <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+                    </svg>
+                    New Student Registration
+                </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <a class="dropdown-item" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle me-2 text-info" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M8.93 6.556c-.534-.14-1.284-.336-1.923-.715A.75.75 0 0 0 7 5.5V4a.5.5 0 0 1 1 0v1.5h.5c.371 0 .69.23.82.556l.01.03a1.5 1.5 0 0 1-.78 2.016zM8 10a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5z"/>
+                    </svg>
+                    Help & Support
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- END: Floating Utility Bar -->
 
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input 
-                                type="password" 
-                                id="password" 
-                                name="password" 
-                                class="form-control" 
-                                placeholder="Enter your password" 
-                                required
-                            >
+<div class="container-fluid login-container">
+    <div class="row align-items-center min-vh-100">
+        <!-- Left side - Image/Graphics placeholder -->
+        <div class="col-lg-6 d-none d-lg-block login-image-section">
+            <div class="login-graphics-placeholder">
+                <div class="university-badge">
+                    <div class="badge-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-award" viewBox="0 0 16 16">
+                            <path d="M9.669.864 8 0 6.331.864l-1.858.282-.842 1.68-1.337 1.32L2.6 6l-.306 1.854 1.337 1.32.842 1.68 1.858.282L8 12l1.669-.864 1.858-.282.842-1.68 1.337-1.32L13.4 6l.306-1.854-1.337-1.32-.842-1.68L9.669.864zm1.196 1.193.684 1.365 1.086 1.072L12.387 6l-.248 1.506-1.086 1.072-.684 1.365-1.51.229L8 10.874l-1.355-.702-1.51-.229-.684-1.365-1.086-1.072L3.614 6l.25-1.506 1.086-1.072.684-1.365 1.51-.229L8 1.126l1.356.702 1.509.229z"/>
+                            <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>
+                        </svg>
+                    </div>
+                    <h3 class="fw-bold text-uppercase tracking-wider">Cavendish University</h3> 
+                    <p class="m-0 fs-6">Excellence in Education Since 2008</p>
+                </div>
+                <div class="graphics-text">
+                    <h2 class="display-5 fw-bold mb-3">Student Portal Access</h2>
+                    <p class="fs-5 opacity-90">Securely access your **academic records**, **payment history**, and **registration details** in one convenient platform.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right side - Login Form -->
+        <div class="col-lg-6 col-md-12">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-10">
+                    <div class="card login-card shadow-lg border-0">
+                        <div class="card-header bg-primary text-white text-center py-4 border-0">
+                            <h2 class="mb-0 fw-bold">Official Student Login</h2>
+                            <p class="mb-0 mt-2 opacity-75">Enter your credentials to proceed</p>
                         </div>
                         
-                        <div class="d-grid mb-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                        <div class="card-body p-5">
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                            <div class="d-flex align-items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16">
+                                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                                </svg>
+                                                {{ message }}
+                                            </div>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+
+                            <!-- Safety check for current_user is important to prevent UndefinedError in base.html logic -->
+                            {% if current_user | default(None) and current_user.is_authenticated %}
+                            <div class="alert alert-success text-center">
+                                You are already logged in as {{ current_user.username or 'Student' }}.
+                                <a href="{{ url_for('student.dashboard') }}" class="alert-link">Go to Dashboard</a>
+                            </div>
+                            <hr class="my-4">
+                            {% endif %}
+                            
+                            <form method="POST" action="{{ url_for('student.student_login') }}" class="needs-validation" novalidate>
+                                <div class="mb-4">
+                                    <label for="student_number" class="form-label fw-semibold">Student Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-badge" viewBox="0 0 16 16">
+                                                <path d="M6.5 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                                <path d="M4.5 0A2.5 2.5 0 0 0 2 2.5V14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2.5A2.5 2.5 0 0 0 11.5 0h-7zM3 2.5A1.5 1.5 0 0 1 4.5 1h7A1.5 1.5 0 0 1 13 2.5v10.795a4.2 4.2 0 0 0-.776-.492C11.392 12.387 10.063 12 8 12s-3.392.387-4.224.803a4.2 4.2 0 0 0-.776.492V2.5z"/>
+                                            </svg>
+                                        </span>
+                                        <input 
+                                            type="text" 
+                                            id="student_number" 
+                                            name="student_number" 
+                                            class="form-control form-control-lg" 
+                                            placeholder="e.g., CUN-2022-001" 
+                                            aria-describedby="studentNumberHelp" 
+                                            required
+                                        >
+                                    </div>
+                                    <div id="studentNumberHelp" class="form-text ms-1">
+                                        Enter your official student number as provided by the university.
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="password" class="form-label fw-semibold">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
+                                                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
+                                            </svg>
+                                        </span>
+                                        <input 
+                                            type="password" 
+                                            id="password" 
+                                            name="password" 
+                                            class="form-control form-control-lg" 
+                                            placeholder="Enter your password" 
+                                            required
+                                        >
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid mb-4">
+                                    <button type="submit" class="btn btn-primary btn-lg py-3 fw-semibold">
+                                        <span>Login to Account</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
+
+                            <hr class="my-4">
+
+                            <!-- Account Options Links -->
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <a href="#" class="text-decoration-none small text-danger fw-semibold my-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle me-1" viewBox="0 0 16 16">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248.113.266.25.09.591.294 1.24.542 1.895.234.606.452 1.26.541 1.724l-.071.21c-.085.346-.288.662-.48.914l-.048.079a.25.25 0 0 0 .343.344l.07-.047c.216-.144.42-.452.54-.806.13-.398.24-.924.322-1.464.088-.6.2-1.29.35-2.228.087-.514.195-1.125.195-1.125.045-.3.177-.735.255-1.18.067-.37.135-.742.135-.742a.236.236 0 0 0-.256-.275h-.946c-.198 0-.361.16-.388.35-.115.795-.294 1.579-.496 2.378-.2.798-.444 1.625-.664 2.471-.2.8-.415 1.65-.63 2.484-.218.845-.444 1.688-.63 2.484.053-.55.191-1.29.346-2.028.16-.763.34-1.554.52-2.355.19-.8.36-1.57.49-2.26.13-.69.22-1.39.22-1.39.04-0.2.14-0.62.22-1.08.08-.46.12-.87.12-.87a.236.236 0 0 0-.256-.275h-.946c-.198 0-.361.16-.388.35"/>
+                                    </svg>
+                                    Forgot Password?
+                                </a>
+                                <a href="#" class="text-decoration-none small text-primary fw-semibold my-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus me-1" viewBox="0 0 16 16">
+                                        <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                                        <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+                                    </svg>
+                                    Register New Account
+                                </a>
+                            </div>
+
                         </div>
-
-                        <div class="text-center">
-                            <a href="{{ url_for('student.student_forgot_password) }}" class="text-decoration-none">Forgot Password?</a>
-                        </div>
-                    </form>
-
-                    <hr class="my-4">
-
-                    <p class="text-center">
-                        Don’t have an account? <a href="{{ url_for('student.student_signup') }}">Sign Up</a>
-                    </p>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted small">
+                            Need help? 
+                            <a href="#" class="text-decoration-none fw-medium text-secondary">Contact the administration office</a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* New utility bar styling for top right corner */
+    .login-utility-bar {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1050; /* Above the login container */
+    }
+    .login-utility-bar .btn {
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(5px);
+        color: white;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .login-utility-bar .btn:hover {
+        background-color: rgba(255, 255, 255, 0.4);
+        color: #1e3c72;
+    }
+    
+    .login-container {
+        /* Adjusted background to remove gradient, relying only on the image and overlay */
+        background-color: #f5f7fa; 
+        min-height: 100vh;
+    }
+    
+    .login-image-section {
+        /* *** IMAGE PATH UPDATED *** */
+        /* Updated filename to studentbg.png and assumed path: static/images/studentbg.png */
+        background-image: linear-gradient(rgba(30, 60, 114, 0.85), rgba(42, 82, 152, 0.85)), url('{{ url_for("static", filename="images/studentbg.png") }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        position: relative; 
+    }
+    
+    .login-graphics-placeholder {
+        text-align: center;
+        max-width: 80%;
+        padding: 2rem;
+        background: rgba(0, 0, 0, 0.1); 
+        border-radius: 10px;
+    }
+    
+    .university-badge {
+        margin-bottom: 3rem;
+    }
+    
+    .badge-icon {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .graphics-text h2 {
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .graphics-text p {
+        font-size: 1.1rem;
+        opacity: 0.95; 
+        line-height: 1.6;
+    }
+    
+    .login-card {
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        border-radius: 1rem 1rem 0 0 !important;
+        /* Kept the strong university colors */
+        background-color: #1e3c72 !important; 
+        background: linear-gradient(45deg, #1e3c72 0%, #2a5298 100%) !important;
+    }
+    
+    .form-control:focus {
+        border-color: #2a5298;
+        box-shadow: 0 0 0 0.25rem rgba(42, 82, 152, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #2a5298 0%, #1e3c72 100%);
+        border: none;
+        transition: all 0.3s ease; 
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #1e3c72 0%, #172b4d 100%);
+        transform: translateY(-2px);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 991.98px) {
+        .login-image-section {
+            display: none;
+        }
+        
+        .login-container {
+            padding: 2rem 0;
+        }
+
+        /* Hide the floating utility bar on mobile to avoid clutter */
+        .login-utility-bar {
+            display: none !important;
+        }
+    }
+</style>
 {% endblock %}
