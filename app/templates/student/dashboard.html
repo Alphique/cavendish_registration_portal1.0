@@ -1,0 +1,58 @@
+<!-- app/templates/student/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Welcome, {{ current_user.username }}!</h1>
+
+    <!-- Link to timetable -->
+    <p><a href="{{ url_for('student.timetable') }}">View Timetable</a></p>
+
+    <!-- Upload new payment slip -->
+    <h2>Submit Payment Slip</h2>
+    <form method="POST" action="{{ url_for('student.upload_payment') }}" enctype="multipart/form-data">
+        <label for="payment_slip">Select slip:</label>
+        <input type="file" name="payment_slip" id="payment_slip" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <!-- Payments table -->
+    <h2>Your Payments</h2>
+    {% if payments %}
+        <table border="1" cellpadding="5">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Status</th>
+                    <th>Description</th>
+                    <th>Submitted Date</th>
+                    <th>Slip</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.id }}</td>
+                    <td>{{ payment.status }}</td>
+                    <td>{{ payment.description or '-' }}</td>
+                    <td>{{ payment.submitted_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        {% if payment.slip_filename %}
+                            <a href="{{ url_for('student.uploaded_file', filename=payment.slip_filename) }}" target="_blank">View Slip</a>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No payments found.</p>
+    {% endif %}
+</body>
+</html>
