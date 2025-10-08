@@ -1,5 +1,5 @@
 # app/models.py
-import datetime
+from datetime import datetime, timezone
 from .extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -45,11 +45,17 @@ class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_number = db.Column(db.String(20), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=True)
+    phone = db.Column(db.String(20), nullable=True)
+    program = db.Column(db.String(50), nullable=True)
+    intake_year = db.Column(db.Integer, nullable=True)
+    year_of_study = db.Column(db.Integer, nullable=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationships
     user = db.relationship("User", back_populates="student_profile", uselist=False)
     payments = db.relationship("Payment", backref="student", lazy=True)
-    registration = db.relationship("Registration", uselist=False, backref="student", lazy=True)
+    registrations = db.relationship("Registration", backref="student", lazy=True)
 
     def __repr__(self):
         return f"<Student {self.student_number} - {self.name}>"
@@ -63,7 +69,8 @@ class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     slip_filename = db.Column(db.String(150), nullable=False)
     status = db.Column(db.String(20), default="Pending")  # Pending, Approved, Rejected
-    submitted_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    description = db.Column(db.Text, nullable=True)
+    submitted_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
 
     def __repr__(self):
@@ -73,15 +80,15 @@ class Payment(db.Model):
 # CHATBOT MESSAGE MODEL
 # --------------------
 class ChatbotMessage(db.Model):
-    __tablename__ = "chatbot_message"
-    
     id = db.Column(db.Integer, primary_key=True)
-    question = db.Column(db.String(500), unique=True, nullable=False)
+    question = db.Column(db.String(500), nullable=False)
     answer = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-
+    category = db.Column(db.String(50), nullable=False, default='unknown')
+    is_known_response = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    
     def __repr__(self):
-        return f"<ChatbotMessage {self.id}>"
+        return f'<ChatbotMessage {self.question}>'
 
 # --------------------
 # REGISTRATION MODEL
@@ -91,9 +98,9 @@ class Registration(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     semester = db.Column(db.String(50), default="Current Semester")
-    registration_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    registration_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     is_registered = db.Column(db.Boolean, default=False)
-    student_id = db.Column(db.Integer, db.ForeignKey("student.id"), unique=True, nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
 
     def __repr__(self):
         return f"<Registration {self.student_id} - {self.semester}>"
