@@ -2,3 +2,9 @@
 Flask
 Flask-SQLAlchemy
 Flask-Migrate
+Flask-Mail
+Flask-Login
+Flask-WTF
+python-dotenv
+email-validator
+gunicorn

@@ -1,6 +1,7 @@
 # app/__init__.py
 import os
 from flask import Flask, render_template
+from flask_login import LoginManager, current_user
 from .config import Config
 from .extensions import db, migrate, mail
 
@@ -9,6 +10,20 @@ from .routes.student_routes import student_bp
 from .routes.admin_routes import admin_bp
 from .routes.chatbot.chatbot_routes import chatbot_bp
 from .routes.general_routes import general as general_bp  # general blueprint
+
+# Import User model for login_manager
+from .models import User
+
+# Initialize LoginManager
+login_manager = LoginManager()
+login_manager.login_view = "student.login"  # redirect if user not logged in
+login_manager.login_message_category = "info"
+
+# Flask-Login user loader
+@login_manager.user_loader
+def load_user(user_id):
+    """Given a user ID, return the associated User object."""
+    return User.query.get(int(user_id))
 
 def create_app(config_class=Config):
     """Application factory pattern for Flask."""
@@ -23,6 +38,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
+    login_manager.init_app(app)
 
     # --- Register Blueprints ---
     app.register_blueprint(student_bp, url_prefix="/student")
@@ -33,7 +49,7 @@ def create_app(config_class=Config):
     # --- Default Route ---
     @app.route("/")
     def index():
-        """Default homepage. Modify as needed."""
+        """Default homepage."""
         return render_template("index.html")
 
     # --- Health Check Route ---
