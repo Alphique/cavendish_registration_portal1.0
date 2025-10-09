@@ -4,6 +4,26 @@
 
 {% block content %}
 <div class="container-fluid admin-login-container">
+    <!-- Admin Utility Bar -->
+    <div class="admin-utility-bar">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center py-2">
+                <div class="text-white small">
+                    <i class="fas fa-shield-alt me-1"></i>
+                    Secure Admin Portal
+                </div>
+                <div class="admin-actions">
+                    <a href="{{ url_for('admin.create_admin') }}" class="btn btn-outline-light btn-sm me-2">
+                        <i class="fas fa-user-plus me-1"></i>Create Admin
+                    </a>
+                    <a href="{{ url_for('admin.manage_admins') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-users-cog me-1"></i>Manage Admins
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row align-items-center min-vh-100">
         <!-- Left side - Admin Graphics Section -->
         <div class="col-lg-6 d-none d-lg-block admin-image-section" 
@@ -14,7 +34,7 @@
                 <div class="admin-badge">
                     <div class="badge-icon admin-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" fill="currentColor" class="bi bi-shield-lock" viewBox="0 0 16 16">
-                            <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
+                            <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.159 0 0 1-1.048-.625 11.777 11.775 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
                             <path d="M9.5 6.5a1.5 1.5 0 0 1-1 1.415l.385 1.99a.5.5 0 0 1-.491.595h-.788a.5.5 0 0 1-.49-.595l.384-1.99a1.5 1.5 0 1 1 2-1.415z"/>
                         </svg>
                     </div>
@@ -26,25 +46,20 @@
                     <p>Manage student registrations, payment verifications, and system administration with elevated security protocols.</p>
                     <div class="security-features">
                         <div class="feature-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle me-2" viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
-                            </svg>
+                            <i class="fas fa-check-circle me-2 text-success"></i>
                             Multi-factor authentication ready
                         </div>
                         <div class="feature-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle me-2" viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
-                            </svg>
+                            <i class="fas fa-check-circle me-2 text-success"></i>
                             Encrypted data transmission
                         </div>
                         <div class="feature-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle me-2" viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
-                            </svg>
+                            <i class="fas fa-check-circle me-2 text-success"></i>
                             Activity monitoring & logging
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle me-2 text-success"></i>
+                            Admin account management
                         </div>
                     </div>
                 </div>
@@ -58,10 +73,7 @@
                     <div class="card admin-login-card shadow-lg border-0">
                         <div class="card-header bg-dark text-white text-center py-4 border-0">
                             <div class="admin-header-icon mb-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-person-shield" viewBox="0 0 16 16">
-                                    <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-                                    <path d="M14.5 0a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-5a.5.5 0 0 1 .5-.5h5zm-1 1h-4v4h4V1z"/>
-                                </svg>
+                                <i class="fas fa-user-shield fa-2x"></i>
                             </div>
                             <h2 class="mb-0">Administrator Login</h2>
                             <p class="mb-0 mt-2 opacity-75">Restricted Access - Authorized Personnel Only</p>
@@ -69,9 +81,7 @@
                         
                         <div class="card-body p-5">
                             <div class="access-warning alert alert-warning d-flex align-items-center mb-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2 flex-shrink-0" viewBox="0 0 16 16">
-                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                                </svg>
+                                <i class="fas fa-exclamation-triangle me-2 flex-shrink-0"></i>
                                 <div>
                                     <strong>Security Notice:</strong> This area contains sensitive information. Unauthorized access is prohibited.
                                 </div>
@@ -82,9 +92,7 @@
                                     {% for category, message in messages %}
                                         <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
                                             <div class="d-flex align-items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16">
-                                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                                                </svg>
+                                                <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-triangle{% endif %} me-2"></i>
                                                 {{ message }}
                                             </div>
                                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -98,9 +106,7 @@
                                     <label for="username" class="form-label fw-semibold">Administrator Username</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-gear" viewBox="0 0 16 16">
-                                                <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm.256 7a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Zm3.63-4.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.56-.31 1.175.116.935.697l-.051.154a.64.64 0 0 0 .448.796l.147.045c.68.212.68 1.099 0 1.311l-.147.045a.64.64 0 0 0-.448.796l.051.154c.24.58-.375 1.007-.935.697l-.136-.074a.64.64 0 0 0-.921.382l-.043.148c-.18.613-1.048.613-1.229 0l-.043-.148a.64.64 0 0 0-.921-.382l-.136.074c-.56.31-1.175-.116-.935-.697l.051-.154a.64.64 0 0 0-.448-.796l-.147-.045c-.68-.212-.68-1.099 0-1.311l.147-.045a.64.64 0 0 0 .448-.796l-.051-.154c-.24-.58.375-1.007.935-.697l.136.074a.64.64 0 0 0 .921-.382l.043-.148ZM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"/>
-                                            </svg>
+                                            <i class="fas fa-user-cog"></i>
                                         </span>
                                         <input 
                                             type="text" 
@@ -117,10 +123,7 @@
                                     <label for="password" class="form-label fw-semibold">Password</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-key" viewBox="0 0 16 16">
-                                                <path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.793-.793-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z"/>
-                                                <path d="M4 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                                            </svg>
+                                            <i class="fas fa-key"></i>
                                         </span>
                                         <input 
                                             type="password" 
@@ -130,27 +133,41 @@
                                             placeholder="Enter secure password" 
                                             required
                                         >
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 
                                 <div class="d-grid mb-4">
                                     <button type="submit" class="btn btn-dark btn-lg py-3 fw-semibold">
-                                        <span>Authenticate & Login</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shield-check ms-2" viewBox="0 0 16 16">
-                                            <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
-                                            <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
-                                        </svg>
+                                        <i class="fas fa-shield-check me-2"></i>
+                                        Authenticate & Login
                                     </button>
                                 </div>
                             </form>
 
-                            <div class="text-center">
+                            <!-- Admin Management Links -->
+                            <div class="admin-management-links mt-4">
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <a href="{{ url_for('admin.create_admin') }}" class="btn btn-outline-primary w-100">
+                                            <i class="fas fa-user-plus me-2"></i>
+                                            Create Admin Account
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="{{ url_for('admin.manage_admins') }}" class="btn btn-outline-secondary w-100">
+                                            <i class="fas fa-users-cog me-2"></i>
+                                            Manage Admins
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
                                 <p class="text-muted small mb-0">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock-history me-1" viewBox="0 0 16 16">
-                                        <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.95.313a7.023 7.023 0 0 0-.179-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1 .025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-.964 1.205c.122-.122.239-.248.35-.378l.758.653a8.073 8.073 0 0 1-.401.432l-.707-.707z"/>
-                                        <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
-                                        <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
-                                    </svg>
+                                    <i class="fas fa-clock-history me-1"></i>
                                     Session timeout: 30 minutes of inactivity
                                 </p>
                             </div>
@@ -160,7 +177,7 @@
                     <div class="text-center mt-4">
                         <p class="text-muted small">
                             For security emergencies, contact 
-                            <a href="#" class="text-decoration-none">IT Security Department</a>
+                            <a href="#" class="text-decoration-none fw-bold">IT Security Department</a>
                         </p>
                     </div>
                 </div>
@@ -173,6 +190,18 @@
     .admin-login-container {
         background: linear-gradient(135deg, #0d2453 0%, #1a3a7a 100%);
         min-height: 100vh;
+        padding-top: 0;
+    }
+    
+    .admin-utility-bar {
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .admin-utility-bar .btn {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.75rem;
     }
     
     .admin-image-section {
@@ -232,6 +261,8 @@
         margin-bottom: 0.75rem;
         font-size: 1rem;
         opacity: 0.9;
+        display: flex;
+        align-items: center;
     }
     
     .admin-login-card {
@@ -240,6 +271,7 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
+        margin-top: 2rem;
     }
     
     .card-header {
@@ -272,12 +304,20 @@
     .btn-dark {
         background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
         border: none;
+        transition: all 0.3s ease;
     }
     
     .btn-dark:hover {
         background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
         transform: translateY(-2px);
+    }
+    
+    .admin-management-links .btn {
         transition: all 0.3s ease;
+    }
+    
+    .admin-management-links .btn:hover {
+        transform: translateY(-1px);
     }
     
     @media (max-width: 991.98px) {
@@ -286,7 +326,7 @@
         }
         
         .admin-login-container {
-            padding: 2rem 0;
+            padding: 1rem 0;
         }
         
         .card-body {
@@ -295,7 +335,57 @@
         
         .admin-login-card {
             background: white;
+            margin-top: 1rem;
+        }
+        
+        .admin-utility-bar {
+            position: relative;
+        }
+        
+        .admin-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .admin-actions .btn {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .admin-management-links .btn {
+            font-size: 0.8rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem !important;
         }
     }
 </style>
+
+<script>
+    // Password visibility toggle
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        // Toggle eye icon
+        const icon = this.querySelector('i');
+        if (type === 'text') {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+
+    // Auto-focus username field
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('username').focus();
+    });
+</script>
 {% endblock %}

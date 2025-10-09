@@ -75,7 +75,7 @@ def dashboard():
     )
 
 # -----------------
-# Approve/Reject Payment (UPDATED)
+# Payment Management
 # -----------------
 @admin_bp.route('/payment/<int:payment_id>/<action>')
 @admin_required
@@ -84,7 +84,7 @@ def manage_payment(payment_id, action):
 
     if action == 'approve':
         payment.status = 'approved'
-        payment.approved_date = datetime.utcnow()  # Set approval timestamp
+        payment.approved_date = datetime.utcnow()
         
         # Create registration record if it doesn't exist
         registration = Registration.query.filter_by(student_id=payment.student_id).first()
@@ -106,8 +106,15 @@ def manage_payment(payment_id, action):
 
     return redirect(url_for('admin.dashboard'))
 
+@admin_bp.route('/payment/<int:payment_id>/preview')
+@admin_required
+def preview_payment(payment_id):
+    """Preview payment details before approval."""
+    payment = Payment.query.get_or_404(payment_id)
+    return render_template('admin/payment_preview.html', payment=payment)
+
 # -----------------
-# Registration Slip Management (NEW)
+# Registration Slip Management
 # -----------------
 @admin_bp.route('/create_registration_slip/<int:student_id>')
 @admin_required
@@ -154,23 +161,7 @@ def view_registration_slips():
     return render_template('admin/registration_slips.html', slips=registration_slips)
 
 # -----------------
-# Serve Uploaded Files
-# -----------------
-@admin_bp.route('/uploads/<filename>')
-@admin_required
-def serve_uploaded_file(filename):
-    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-    if not os.path.exists(file_path):
-        flash('File not found.', 'danger')
-        return redirect(url_for('admin.dashboard'))
-    return send_from_directory(
-        directory=current_app.config['UPLOAD_FOLDER'],
-        path=filename,
-        as_attachment=False
-    )
-
-# -----------------
-# Student Management (NEW)
+# Student Management
 # -----------------
 @admin_bp.route('/students')
 @admin_required
@@ -192,4 +183,117 @@ def view_student_details(student_id):
         student=student,
         payments=payments,
         registration_slip=registration_slip
+    )
+
+# -----------------
+# Admin Management
+# -----------------
+@admin_bp.route('/create_admin', methods=['GET', 'POST'])
+@admin_required
+def create_admin():
+    """Create a new admin account."""
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        # Validation
+        if not all([username, email, password, confirm_password]):
+            flash("All fields are required.", "danger")
+            return redirect(url_for('admin.create_admin'))
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return redirect(url_for('admin.create_admin'))
+
+        if User.query.filter_by(username=username).first():
+            flash("Username already exists.", "danger")
+            return redirect(url_for('admin.create_admin'))
+
+        if User.query.filter_by(email=email).first():
+            flash("Email already exists.", "danger")
+            return redirect(url_for('admin.create_admin'))
+
+        # Create admin user
+        admin_user = User(
+            username=username,
+            email=email,
+            role='admin'
+        )
+        admin_user.set_password(password)
+        
+        db.session.add(admin_user)
+        db.session.commit()
+
+        flash(f"Admin account for {username} created successfully!", "success")
+        return redirect(url_for('admin.manage_admins'))
+
+    return render_template('admin/create_admin.html')
+
+@admin_bp.route('/manage_admins')
+@admin_required
+def manage_admins():
+    """View and manage all admin accounts."""
+    admins = User.query.filter_by(role='admin').all()
+    return render_template('admin/manage_admins.html', admins=admins)
+
+@admin_bp.route('/reset_admin_password/<int:admin_id>', methods=['GET', 'POST'])
+@admin_required
+def reset_admin_password(admin_id):
+    """Reset password for an admin account."""
+    admin_user = User.query.filter_by(id=admin_id, role='admin').first_or_404()
+    
+    if request.method == 'POST':
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not new_password:
+            flash("New password is required.", "danger")
+            return redirect(url_for('admin.reset_admin_password', admin_id=admin_id))
+
+        if new_password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return redirect(url_for('admin.reset_admin_password', admin_id=admin_id))
+
+        # Update password
+        admin_user.set_password(new_password)
+        db.session.commit()
+
+        flash(f"Password for {admin_user.username} has been reset successfully!", "success")
+        return redirect(url_for('admin.manage_admins'))
+
+    return render_template('admin/reset_admin_password.html', admin_user=admin_user)
+
+@admin_bp.route('/delete_admin/<int:admin_id>')
+@admin_required
+def delete_admin(admin_id):
+    """Delete an admin account (cannot delete yourself)."""
+    if admin_id == session.get('user_id'):
+        flash("You cannot delete your own account.", "danger")
+        return redirect(url_for('admin.manage_admins'))
+
+    admin_user = User.query.filter_by(id=admin_id, role='admin').first_or_404()
+    username = admin_user.username
+    
+    db.session.delete(admin_user)
+    db.session.commit()
+
+    flash(f"Admin account for {username} has been deleted.", "success")
+    return redirect(url_for('admin.manage_admins'))
+
+# -----------------
+# File Serving
+# -----------------
+@admin_bp.route('/uploads/<filename>')
+@admin_required
+def serve_uploaded_file(filename):
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+    if not os.path.exists(file_path):
+        flash('File not found.', 'danger')
+        return redirect(url_for('admin.dashboard'))
+    return send_from_directory(
+        directory=current_app.config['UPLOAD_FOLDER'],
+        path=filename,
+        as_attachment=False
     )
