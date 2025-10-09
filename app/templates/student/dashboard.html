@@ -230,6 +230,10 @@
             margin-bottom: 15px;
         }
         
+        .registration-status-card {
+            border-left: 4px solid var(--primary);
+        }
+        
         @media (max-width: 768px) {
             .dashboard-header {
                 padding: 20px;
@@ -275,12 +279,12 @@
         <!-- Quick Actions -->
         <div class="row mb-4">
             <div class="col-md-4 mb-3">
-                <a href="{{ url_for('student.timetable') }}" class="dashboard-card quick-action-card">
+                <a href="{{ url_for('student.download_timetable') }}" class="dashboard-card quick-action-card">
                     <div class="action-icon">
                         <i class="fas fa-calendar-alt"></i>
                     </div>
-                    <div class="action-title">View Timetable</div>
-                    <div class="action-description">Check your class schedule and academic calendar</div>
+                    <div class="action-title">Download Timetable</div>
+                    <div class="action-description">Get your class schedule as PDF</div>
                 </a>
             </div>
             <div class="col-md-4 mb-3">
@@ -300,6 +304,53 @@
                     <div class="action-title">Help & Support</div>
                     <div class="action-description">Get assistance with any issues</div>
                 </a>
+            </div>
+        </div>
+        
+        <!-- Registration Status Section -->
+        <div class="dashboard-card mb-4 registration-status-card">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-clipboard-check me-2"></i>
+                Registration Status
+            </div>
+            <div class="card-body">
+                {% set approved_payment = payments|selectattr("status", "equalto", "approved")|first %}
+                {% if approved_payment %}
+                    <div class="alert alert-success d-flex align-items-center">
+                        <i class="fas fa-check-circle fa-2x me-3"></i>
+                        <div>
+                            <h5 class="mb-1">Payment Approved!</h5>
+                            <p class="mb-0">Your payment was approved on {{ approved_payment.approved_date.strftime('%Y-%m-%d') if approved_payment.approved_date else 'Recently' }}</p>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('student.download_registration_slip') }}" class="btn btn-success btn-lg me-3">
+                            <i class="fas fa-download me-2"></i> Download Registration Slip
+                        </a>
+                        <a href="{{ url_for('student.download_timetable') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-calendar-alt me-2"></i> Download Timetable
+                        </a>
+                    </div>
+                {% else %}
+                    {% set pending_payment = payments|selectattr("status", "equalto", "pending")|first %}
+                    {% if pending_payment %}
+                        <div class="alert alert-warning d-flex align-items-center">
+                            <i class="fas fa-clock fa-2x me-3"></i>
+                            <div>
+                                <h5 class="mb-1">Payment Under Review</h5>
+                                <p class="mb-0">Your payment submitted on {{ pending_payment.submitted_date.strftime('%Y-%m-%d') }} is pending approval.</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info d-flex align-items-center">
+                            <i class="fas fa-info-circle fa-2x me-3"></i>
+                            <div>
+                                <h5 class="mb-1">No Payment Submitted</h5>
+                                <p class="mb-0">Please upload a payment slip to begin the registration process.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
             </div>
         </div>
         

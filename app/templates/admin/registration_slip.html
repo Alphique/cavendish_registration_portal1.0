@@ -1,0 +1,689 @@
+<!--app/templates/admin/registration_slip.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration and Clearance Form | Cavendish University Zambia</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e3c72;
+            --secondary: #2a5298;
+            --accent: #4dabf7;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --border: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 50%;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--secondary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: #fff;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.1);
+        }
+
+        .form-control:required:invalid {
+            border-color: #dc3545;
+        }
+
+        .form-control:required:valid {
+            border-color: #28a745;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f5fd;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 1px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success i {
+            font-size: 1.3rem;
+            color: #28a745;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #172b4d 0%, var(--primary) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(30, 60, 114, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: var(--light);
+            color: #6c757d;
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .signature-area {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .signature-line {
+            display: inline-block;
+            width: 200px;
+            border-bottom: 1px solid #333;
+            margin-right: 20px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn-secondary, .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .required::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .form-hint {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        
+        .student-type {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .student-type label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        
+        .student-type input {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-container">
+            <div class="logo">
+                <!-- Replace with actual logo path -->
+                <i class="fas fa-university" style="font-size: 2rem; color: var(--primary);"></i>
+            </div>
+            <div>
+                <h1>CAVENDISH UNIVERSITY ZAMBIA</h1>
+                <p>NEW SEMESTER REGISTRATION AND CLEARANCE FORM</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>Important:</strong> This form <strong>MUST</strong> be completed by both returning and new students at the beginning of every new semester.
+            </div>
+        </div>
+
+        {% if success %}
+        <div class="alert-success">
+            <i class="fas fa-check-circle"></i>
+            <div>
+                <strong>Success!</strong> Registration slip created for {{ student_name }}.
+                <br>
+                <small>Slip Number: {{ slip_number }}</small>
+            </div>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('admin.create_registration_slip') }}">
+            <!-- Student Type Section -->
+            <div class="student-type">
+                <label>
+                    <input type="radio" name="student_type" value="returning" required> Returning
+                </label>
+                <label>
+                    <input type="radio" name="student_type" value="new" required> New
+                </label>
+                <span style="font-size: 0.9rem; color: #6c757d;">(1%)</span>
+            </div>
+
+            <!-- Student Information Section -->
+            <div class="section-title">
+                <i class="fas fa-user-graduate"></i>
+                <span>STUDENT PARTICULARS</span>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="first_name" class="required">First Name</label>
+                    <input type="text" name="first_name" id="first_name" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="student_number" class="required">Student Number</label>
+                    <input type="text" name="student_number" id="student_number" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="other_name">Other Name</label>
+                    <input type="text" name="other_name" id="other_name" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="program_name" class="required">Program Name</label>
+                    <input type="text" name="program_name" id="program_name" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="surname" class="required">Surname</label>
+                    <input type="text" name="surname" id="surname" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="intake" class="required">Intake</label>
+                    <select name="intake" id="intake" class="form-control" required>
+                        <option value="">-- Select Intake --</option>
+                        <option value="Jan">January</option>
+                        <option value="Apr">April</option>
+                        <option value="Jul">July</option>
+                        <option value="Oct">October</option>
+                    </select>
+                    <div class="form-hint">Year: <input type="text" name="intake_year" style="width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 3px;" placeholder="2025"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="required">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="session" class="required">Session</label>
+                        <select name="session" id="session" class="form-control" required>
+                        <option value="">-- Select Session --</option>
+                        <option value="DJ">DJ</option>
+                        <option value="Day">Day</option>
+                        <option value="Eve">Eve</option>
+                        <option value="Weekend">Weekend</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="contact" class="required">Contact/Number</label>
+                    <input type="text" name="contact" id="contact" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="level" class="required">Level</label>
+                    <select name="level" id="level" class="form-control" required>
+                        <option value="">-- Select Level --</option>
+                        <option value="Y181">Y181</option>
+                        <option value="Y182">Y182</option>
+                        <option value="Y183">Y183</option>
+                    </select>
+                    <div class="form-hint">Year/Semester (e.g. Yoo T., Semester 1)</div>
+                </div>
+            </div>
+
+            <!-- Modules Section -->
+            <div class="section-title">
+                <i class="fas fa-book"></i>
+                <span>MODULES TO BE TAKEN / EXEMPTED (CREDIT TRANSFER) THIS SEMESTER</span>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Module Code</th>
+                            <th>Module Name</th>
+                            <th>To be taken [Tick Appropriate]</th>
+                            <th>Repeat [Tick Appropriate]</th>
+                            <th>Exempted [Tick Appropriate]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" class="form-control" name="module_code_1"></td>
+                            <td><input type="text" class="form-control" name="module_name_1"></td>
+                            <td>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="taken_1">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="repeat_1">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="exempted_1">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" class="form-control" name="module_code_2"></td>
+                            <td><input type="text" class="form-control" name="module_name_2"></td>
+                            <td>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="taken_2">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="repeat_2">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="exempted_2">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" class="form-control" name="module_code_3"></td>
+                            <td><input type="text" class="form-control" name="module_name_3"></td>
+                            <td>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="taken_3">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="repeat_3">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="exempted_3">
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Official Use Section -->
+            <div class="section-title">
+                <i class="fas fa-stamp"></i>
+                <span>OFFICIAL USE</span>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Cleared by [Name]</th>
+                            <th>Signature</th>
+                            <th>Date Cleared</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Faculty Clearance</td>
+                            <td><input type="text" class="form-control" name="faculty_name"></td>
+                            <td><input type="text" class="form-control" name="faculty_signature"></td>
+                            <td><input type="date" class="form-control" name="faculty_date"></td>
+                            <td><input type="text" class="form-control" name="faculty_remarks"></td>
+                        </tr>
+                        <tr>
+                            <td>Academic Office Clearance</td>
+                            <td><input type="text" class="form-control" name="academic_name"></td>
+                            <td><input type="text" class="form-control" name="academic_signature"></td>
+                            <td><input type="date" class="form-control" name="academic_date"></td>
+                            <td><input type="text" class="form-control" name="academic_remarks"></td>
+                        </tr>
+                        <tr>
+                            <td>Continuing Office Clearance</td>
+                            <td><input type="text" class="form-control" name="continuing_name"></td>
+                            <td><input type="text" class="form-control" name="continuing_signature"></td>
+                            <td><input type="date" class="form-control" name="continuing_date"></td>
+                            <td><input type="text" class="form-control" name="continuing_remarks"></td>
+                        </tr>
+                        <tr>
+                            <td>Finance Clearance</td>
+                            <td><input type="text" class="form-control" name="finance_name"></td>
+                            <td><input type="text" class="form-control" name="finance_signature"></td>
+                            <td><input type="date" class="form-control" name="finance_date"></td>
+                            <td><input type="text" class="form-control" name="finance_remarks"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Signature Section -->
+            <div class="signature-area">
+                <p>I confirm that I have consented to the CUZ Registration terms and conditions.</p>
+                <p>
+                    SIGNATURE: <span class="signature-line"></span> 
+                    DATE: <span class="signature-line"></span>
+                </p>
+                <div class="form-hint" style="margin-top: 10px;">
+                    <strong>Note:</strong> completed forms <strong>MUST</strong> be submitted to Registrations office
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <div>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </a>
+                    <a href="{{ url_for('admin.view_registration_slips') }}" class="btn-secondary">
+                        <i class="fas fa-list"></i>
+                        View All Slips
+                    </a>
+                </div>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-file-contract"></i>
+                    Generate Registration Slip
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="footer">
+        <p>
+            <i class="fas fa-shield-alt"></i>
+            Secure Admin Portal • Cavendish University Zambia Registrar Module
+            <br>
+            <small>© 2024 Cavendish University Zambia. All rights reserved.</small>
+        </p>
+    </div>
+</div>
+
+<script>
+    // Set today's date as default for all date fields
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+        input.value = today;
+    });
+    
+    // Auto-fill current year for intake year
+    document.querySelector('input[name="intake_year"]').value = new Date().getFullYear();
+    
+    // Form validation enhancement
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const requiredFields = document.querySelectorAll('[required]');
+        let valid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value) {
+                valid = false;
+                field.style.borderColor = '#dc3545';
+            }
+        });
+        
+        if (!valid) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -10,3 +10,6 @@ class Config:
 
     # Folder to store uploaded payment slips
     UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+    
+    # NEW: Folder to store registration slip PDFs
+    REGISTRATION_SLIP_FOLDER = os.path.join(BASE_DIR, "registration_slips")

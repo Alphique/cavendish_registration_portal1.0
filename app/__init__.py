@@ -30,9 +30,12 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # --- Ensure upload folder exists ---
+    # --- Ensure ALL required folders exist ---
     upload_folder = app.config.get("UPLOAD_FOLDER", "uploads")
+    registration_slip_folder = app.config.get("REGISTRATION_SLIP_FOLDER", "registration_slips")
+    
     os.makedirs(upload_folder, exist_ok=True)
+    os.makedirs(registration_slip_folder, exist_ok=True)
 
     # --- Initialize extensions ---
     db.init_app(app)

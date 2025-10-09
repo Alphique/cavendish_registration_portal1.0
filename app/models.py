@@ -56,6 +56,7 @@ class Student(db.Model):
     user = db.relationship("User", back_populates="student_profile", uselist=False)
     payments = db.relationship("Payment", backref="student", lazy=True)
     registrations = db.relationship("Registration", backref="student", lazy=True)
+    registration_slips = db.relationship("RegistrationSlip", backref="student", lazy=True)
 
     def __repr__(self):
         return f"<Student {self.student_number} - {self.name}>"
@@ -68,13 +69,36 @@ class Payment(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     slip_filename = db.Column(db.String(150), nullable=False)
-    status = db.Column(db.String(20), default="Pending")  # Pending, Approved, Rejected
+    status = db.Column(db.String(20), default="pending")  # pending, approved, rejected
     description = db.Column(db.Text, nullable=True)
     submitted_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    approved_date = db.Column(db.DateTime, nullable=True)  # NEW FIELD
     student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
+    
+    # Optional payment details (for registration slip)
+    amount = db.Column(db.Float, nullable=True)
+    method = db.Column(db.String(50), nullable=True)
+    reference = db.Column(db.String(100), nullable=True)
 
     def __repr__(self):
         return f"<Payment {self.id} - {self.status}>"
+
+# --------------------
+# REGISTRATION SLIP MODEL (UPDATED)
+# --------------------
+class RegistrationSlip(db.Model):
+    __tablename__ = "registration_slip"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    slip_number = db.Column(db.String(50), unique=True, nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    issue_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    pdf_filename = db.Column(db.String(255), nullable=True)  # NEW: Store PDF filename
+    created_by = db.Column(db.String(100), nullable=True)    # NEW: Admin who created it
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)  # NEW: Creation timestamp
+
+    def __repr__(self):
+        return f"<RegistrationSlip {self.slip_number} - {self.student.name}>"
 
 # --------------------
 # CHATBOT MESSAGE MODEL
