@@ -31,7 +31,7 @@ def upgrade():
     )
     with op.batch_alter_table('payment', schema=None) as batch_op:
         batch_op.add_column(sa.Column('receipt_image', sa.String(length=255), nullable=True))
-        batch_op.create_unique_constraint(None, ['reference'])
+        batch_op.create_unique_constraint('uq_payment_reference', ['reference'])  # FIXED: Added constraint name
 
     with op.batch_alter_table('registration', schema=None) as batch_op:
         batch_op.add_column(sa.Column('academic_year', sa.String(length=20), nullable=True))
@@ -73,7 +73,7 @@ def downgrade():
         batch_op.drop_column('academic_year')
 
     with op.batch_alter_table('payment', schema=None) as batch_op:
-        batch_op.drop_constraint(None, type_='unique')
+        batch_op.drop_constraint('uq_payment_reference', type_='unique')  # FIXED: Added constraint name
         batch_op.drop_column('receipt_image')
 
     op.drop_table('system_log')
