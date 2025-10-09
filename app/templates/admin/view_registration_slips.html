@@ -1,0 +1,241 @@
+<!--app/templates/admin/view_registration_slip.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Slips - Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        .table-actions {
+            white-space: nowrap;
+        }
+        .status-badge {
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid py-4">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-file-contract me-2"></i>Registration Slips Management
+                        </h4>
+                        <div>
+                            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-light btn-sm">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                            </a>
+                            <a href="{{ url_for('admin.create_registration_slip_form') }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-plus me-1"></i>Create New Slip
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Statistics -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card text-white bg-primary">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ slips|length }}</h5>
+                                        <p class="card-text">Total Slips</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-white bg-success">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ slips|selectattr('pdf_filename')|list|length }}</h5>
+                                        <p class="card-text">PDFs Generated</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-white bg-warning">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ slips|rejectattr('pdf_filename')|list|length }}</h5>
+                                        <p class="card-text">Pending PDFs</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-white bg-info">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ today_count }}</h5>
+                                        <p class="card-text">Today's Slips</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if slips %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Slip Number</th>
+                                        <th>Student Name</th>
+                                        <th>Student Number</th>
+                                        <th>Program</th>
+                                        <th>Faculty</th>
+                                        <th>Academic Year</th>
+                                        <th>Semester</th>
+                                        <th>Issue Date</th>
+                                        <th>PDF Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for slip in slips %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ slip.slip_number }}</strong>
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('admin.view_student_details', student_id=slip.student.id) }}" 
+                                               class="text-decoration-none">
+                                                {{ slip.student.name }}
+                                            </a>
+                                        </td>
+                                        <td>{{ slip.student.student_number }}</td>
+                                        <td>{{ slip.program_name or '<span class="text-muted">Not set</span>'|safe }}</td>
+                                        <td>{{ slip.faculty_name or '<span class="text-muted">Not set</span>'|safe }}</td>
+                                        <td>{{ slip.academic_year or '2024/2025' }}</td>
+                                        <td>{{ slip.semester or 'Semester 1' }}</td>
+                                        <td>{{ slip.issue_date.strftime('%d/%m/%Y') }}</td>
+                                        <td>
+                                            {% if slip.pdf_filename %}
+                                                <span class="badge bg-success status-badge">
+                                                    <i class="fas fa-check me-1"></i>Generated
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning status-badge">
+                                                    <i class="fas fa-clock me-1"></i>Pending
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="table-actions">
+                                            <div class="btn-group btn-group-sm">
+                                                <!-- Edit Button -->
+                                                <a href="{{ url_for('admin.edit_registration_slip', slip_id=slip.id) }}" 
+                                                   class="btn btn-outline-primary" 
+                                                   title="Edit Slip">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                
+                                                <!-- Regenerate PDF Button -->
+                                                <a href="{{ url_for('admin.regenerate_slip_pdf', slip_id=slip.id) }}" 
+                                                   class="btn btn-outline-warning" 
+                                                   title="Regenerate PDF">
+                                                    <i class="fas fa-sync"></i>
+                                                </a>
+                                                
+                                                <!-- Download Button -->
+                                                {% if slip.pdf_filename %}
+                                                <a href="{{ url_for('admin.serve_registration_slip', filename=slip.pdf_filename) }}" 
+                                                   class="btn btn-outline-success" 
+                                                   target="_blank"
+                                                   title="Download PDF">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                                {% else %}
+                                                <button class="btn btn-outline-secondary" disabled title="No PDF available">
+                                                    <i class="fas fa-download"></i>
+                                                </button>
+                                                {% endif %}
+                                                
+                                                <!-- Delete Button -->
+                                                <a href="{{ url_for('admin.delete_registration_slip', slip_id=slip.id) }}" 
+                                                   class="btn btn-outline-danger" 
+                                                   onclick="return confirm('Are you sure you want to delete this registration slip? This action cannot be undone.')"
+                                                   title="Delete Slip">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination or summary -->
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="text-muted">
+                                Showing <strong>{{ slips|length }}</strong> registration slip(s)
+                            </div>
+                            <div>
+                                <a href="{{ url_for('admin.create_registration_slip_form') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-1"></i>Create New Registration Slip
+                                </a>
+                            </div>
+                        </div>
+
+                        {% else %}
+                        <!-- Empty state -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-contract fa-4x text-muted mb-3"></i>
+                            <h3 class="text-muted">No Registration Slips Found</h3>
+                            <p class="text-muted mb-4">
+                                There are no registration slips in the system yet.
+                            </p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ url_for('admin.create_registration_slip_form') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-1"></i>Create First Slip
+                                </a>
+                                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Enhanced confirmation for delete
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteLinks = document.querySelectorAll('a[href*="delete_registration_slip"]');
+            deleteLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (!confirm('⚠️ WARNING: This will permanently delete the registration slip and its PDF file. This action cannot be undone!\n\nAre you sure you want to proceed?')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

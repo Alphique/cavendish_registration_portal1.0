@@ -1,0 +1,150 @@
+<!--app/templates/admin/manage_admins.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Admins - Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin.dashboard') }}">
+                <i class="fas fa-university me-2"></i>Cavendish University Admin
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                </a>
+                <a class="nav-link" href="{{ url_for('admin.create_admin') }}">
+                    <i class="fas fa-user-plus me-1"></i>Create Admin
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">
+                    <i class="fas fa-users-cog me-2"></i>Manage Admin Accounts ({{ admins|length }})
+                </h4>
+            </div>
+            <div class="card-body">
+                {% if admins %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Created</th>
+                                    <th>Last Login</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for admin in admins %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ admin.username }}</strong>
+                                        {% if admin.id == session.user_id %}
+                                            <span class="badge bg-primary ms-1">You</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ admin.email }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ admin.role|title }}</span>
+                                    </td>
+                                    <td>
+                                        {% if admin.created_at %}
+                                            {{ admin.created_at.strftime('%Y-%m-%d') }}
+                                        {% else %}
+                                            <span class="text-muted">Unknown</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if admin.last_login %}
+                                            {{ admin.last_login.strftime('%Y-%m-%d %H:%M') }}
+                                        {% else %}
+                                            <span class="text-muted">Never</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if admin.id == session.user_id %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <!-- Reset Password Button -->
+                                            <a href="{{ url_for('admin.reset_admin_password', admin_id=admin.id) }}" 
+                                               class="btn btn-outline-warning" title="Reset Password">
+                                                <i class="fas fa-key"></i>
+                                            </a>
+                                            
+                                            <!-- Delete Button (only for other admins) -->
+                                            {% if admin.id != session.user_id %}
+                                            <a href="{{ url_for('admin.delete_admin', admin_id=admin.id) }}" 
+                                               class="btn btn-outline-danger" 
+                                               title="Delete Admin"
+                                               onclick="return confirm('Are you sure you want to delete admin account for {{ admin.username }}? This action cannot be undone.')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                            {% else %}
+                                            <button class="btn btn-outline-secondary" disabled title="Cannot delete your own account">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Important Notes -->
+                    <div class="alert alert-info mt-3">
+                        <h6><i class="fas fa-info-circle me-2"></i>Important Notes:</h6>
+                        <ul class="mb-0">
+                            <li>You cannot delete your own admin account</li>
+                            <li>Password reset will require the admin to set a new password</li>
+                            <li>Admin accounts have full access to the system</li>
+                            <li>Keep admin accounts secure and limit their number</li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-users-cog fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Admin Accounts Found</h5>
+                        <p class="text-muted">Create the first admin account to get started.</p>
+                        <a href="{{ url_for('admin.create_admin') }}" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-1"></i>Create First Admin
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

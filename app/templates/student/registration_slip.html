@@ -1,177 +1,375 @@
-<!-- app/templates/student/registration_slip.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Registration Slip - {{ student.name }}</title>
+    <title>Registration Slip - Student</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 30px;
-        }
-
-        .slip-container {
-            max-width: 850px;
-            background-color: #fff;
+        .registration-slip {
+            max-width: 800px;
             margin: 0 auto;
-            padding: 40px;
-            border: 1px solid #ccc;
+            border: 2px solid #1e3c72;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-
         .header {
-            text-align: center;
-            border-bottom: 2px solid #1e3c72;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            margin: 8px 0 0 0;
-            font-size: 24px;
-            color: #1e3c72;
-            font-weight: bold;
-        }
-
-        .sub-title {
-            text-align: center;
-            font-weight: bold;
-            margin-top: 5px;
-            font-size: 18px;
-            color: #2a5298;
-        }
-
-        .section {
-            margin-top: 25px;
-        }
-
-        .section h2 {
-            font-size: 16px;
-            color: #1e3c72;
-            border-left: 5px solid #1e3c72;
-            padding-left: 12px;
-            margin-bottom: 15px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 12px;
-        }
-
-        th, td {
-            padding: 10px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        th {
-            width: 30%;
-            font-weight: 600;
-            color: #2a5298;
-        }
-
-        tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .footer {
-            margin-top: 35px;
-            text-align: center;
-            font-size: 13px;
-            color: #555;
-            border-top: 1px solid #e0e0e0;
-            padding-top: 20px;
-        }
-
-        .pdf-btn {
-            display: inline-block;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
-            text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .slip-content {
+            padding: 30px;
+        }
+        .student-info table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .student-info th, .student-info td {
+            padding: 10px 12px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+        .student-info th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            width: 35%;
+            color: #1e3c72;
+        }
+        .section-title {
+            color: #1e3c72;
+            border-bottom: 2px solid #1e3c72;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            border-radius: 0 0 8px 8px;
+            font-size: 0.9em;
+        }
+        .download-options {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .qr-code {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .qr-code img {
+            max-width: 150px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .registration-slip {
+                border: none;
+                box-shadow: none;
+                margin: 0;
+            }
+            .download-options {
+                display: none;
+            }
+        }
+        .validity-badge {
+            background: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
             font-weight: bold;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .pdf-btn:hover {
-            background: linear-gradient(135deg, #172b4d 0%, #1e3c72 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
-        }
-
-        .back-btn {
-            display: inline-block;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            margin-right: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .back-btn:hover {
-            background-color: #545b62;
-            color: white;
-            text-decoration: none;
         }
     </style>
 </head>
-<body>
+<body class="bg-light">
+    <div class="container py-4">
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-<div class="slip-container">
-    <div class="header">
-        <h1>CAVENDISH UNIVERSITY ZAMBIA</h1>
-        <div class="sub-title">OFFICIAL REGISTRATION SLIP</div>
+        <!-- Back to Dashboard Button -->
+        <div class="mb-3 no-print">
+            <a href="{{ url_for('student.student_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+            </a>
+        </div>
+
+        {% if registration_slip and student %}
+        <!-- REGISTRATION SLIP AVAILABLE -->
+        <div class="registration-slip" id="registrationSlip">
+            <!-- Header -->
+            <div class="header">
+                <div class="row align-items-center">
+                    <div class="col-2">
+                        <i class="fas fa-university fa-3x"></i>
+                    </div>
+                    <div class="col-8">
+                        <h2 class="mb-1">CAVENDISH UNIVERSITY ZAMBIA</h2>
+                        <p class="mb-0">OFFICIAL REGISTRATION SLIP</p>
+                        <small>Academic Year {{ registration_slip.academic_year or '2024/2025' }}</small>
+                    </div>
+                    <div class="col-2 text-end">
+                        <small><strong>Slip #:</strong><br>{{ registration_slip.slip_number }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slip Content -->
+            <div class="slip-content">
+                <!-- Student Information -->
+                <div class="student-info">
+                    <h4 class="section-title">
+                        <i class="fas fa-user-graduate me-2"></i>STUDENT INFORMATION
+                    </h4>
+                    <table>
+                        <tr>
+                            <th>Full Name:</th>
+                            <td><strong>{{ student.name }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Student Number:</th>
+                            <td><strong>{{ student.student_number }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Programme:</th>
+                            <td>{{ registration_slip.program_name or student.program or 'Not specified' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Faculty:</th>
+                            <td>{{ registration_slip.faculty_name or student.faculty or 'Not specified' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Academic Year:</th>
+                            <td>{{ registration_slip.academic_year or '2024/2025' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Semester:</th>
+                            <td>{{ registration_slip.semester or student.semester or 'Semester 1' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Intake Year:</th>
+                            <td>{{ student.intake_year or 'Not specified' }}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Payment Information -->
+                {% if payment %}
+                <div class="student-info">
+                    <h4 class="section-title">
+                        <i class="fas fa-receipt me-2"></i>PAYMENT INFORMATION
+                    </h4>
+                    <table>
+                        <tr>
+                            <th>Amount Paid:</th>
+                            <td><strong>ZMW {{ "%.2f"|format(payment.amount) if payment.amount else 'Not specified' }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Payment Method:</th>
+                            <td>{{ payment.method or 'Not specified' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Reference Number:</th>
+                            <td><code>{{ payment.reference or 'Not specified' }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>Payment Date:</th>
+                            <td>{{ payment.approved_date.strftime('%d/%m/%Y') if payment.approved_date else 'Not specified' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Payment Status:</th>
+                            <td><span class="badge bg-success">APPROVED</span></td>
+                        </tr>
+                    </table>
+                </div>
+                {% endif %}
+
+                <!-- Registration Details -->
+                <div class="student-info">
+                    <h4 class="section-title">
+                        <i class="fas fa-calendar-check me-2"></i>REGISTRATION DETAILS
+                    </h4>
+                    <table>
+                        <tr>
+                            <th>Issue Date:</th>
+                            <td>{{ registration_slip.issue_date.strftime('%d/%m/%Y') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Registration Status:</th>
+                            <td><span class="validity-badge">ACTIVE & REGISTERED</span></td>
+                        </tr>
+                        <tr>
+                            <th>Valid Until:</th>
+                            <td>
+                                {% set valid_until = registration_slip.issue_date.replace(month=registration_slip.issue_date.month + 6) %}
+                                {{ valid_until.strftime('%d/%m/%Y') }}
+                                <small class="text-muted d-block">(6 months from issue date)</small>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- QR Code Placeholder -->
+                <div class="qr-code">
+                    <div style="border: 1px dashed #ccc; padding: 20px; border-radius: 8px; background: #f9f9f9;">
+                        <i class="fas fa-qrcode fa-3x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">QR Code for Verification</p>
+                        <small class="text-muted">Scan to verify registration status</small>
+                    </div>
+                </div>
+
+                <!-- Important Notes -->
+                <div class="alert alert-warning mt-4">
+                    <h6 class="alert-heading mb-3">
+                        <i class="fas fa-exclamation-circle me-2"></i>IMPORTANT INFORMATION:
+                    </h6>
+                    <ul class="mb-0 small">
+                        <li>This registration slip is your official proof of registration for the current semester</li>
+                        <li>Keep this document safe and present it when required by university authorities</li>
+                        <li>This slip is valid for all university activities until the expiry date shown above</li>
+                        <li>Report any issues or discrepancies to the Registration Office immediately</li>
+                        <li>Unauthorized duplication or alteration of this document is prohibited</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="row">
+                    <div class="col-md-4 text-start">
+                        <small>
+                            <strong>Issued By:</strong><br>
+                            {{ registration_slip.created_by or 'CUZ Registration System' }}
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <small>
+                            <strong>Official Stamp:</strong><br>
+                            <i class="fas fa-stamp text-muted"></i> CAVENDISH UNIVERSITY
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <small>
+                            <strong>Issue Date & Time:</strong><br>
+                            {{ registration_slip.issue_date.strftime('%d/%m/%Y %H:%M') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Options -->
+        <div class="download-options no-print">
+            <h4 class="text-center mb-4">
+                <i class="fas fa-download me-2"></i>Download Your Registration Slip
+            </h4>
+            <div class="row justify-content-center">
+                <div class="col-md-5 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+                            <h5 class="card-title">Official PDF Format</h5>
+                            <p class="card-text small">Download the official admin-generated registration slip PDF</p>
+                            <a href="{{ url_for('student.download_registration_slip') }}" class="btn btn-danger w-100">
+                                <i class="fas fa-download me-1"></i>Download PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-print fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">Print Slip</h5>
+                            <p class="card-text small">Print this registration slip for your records</p>
+                            <button onclick="window.print()" class="btn btn-primary w-100">
+                                <i class="fas fa-print me-1"></i>Print Slip
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Info -->
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    The PDF version is the official document generated by the administration
+                </small>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- NO REGISTRATION SLIP AVAILABLE -->
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-file-contract fa-4x text-muted mb-3"></i>
+                <h3 class="text-muted">Registration Slip Not Available</h3>
+                <p class="text-muted mb-4">
+                    Your registration slip is currently being processed. It will be available here once your payment has been approved and registration is complete.
+                </p>
+                
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle me-2"></i>Registration Process:
+                            </h6>
+                            <div class="row text-start">
+                                <div class="col-md-6">
+                                    <ul class="mb-0">
+                                        <li>Submit payment receipt</li>
+                                        <li>Wait for payment verification</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="mb-0">
+                                        <li>Admin approval process</li>
+                                        <li>Automatic slip generation</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="{{ url_for('student.student_dashboard') }}" class="btn btn-primary me-2">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                    </a>
+                    {% if not payment %}
+                    <a href="{{ url_for('student.upload_payment') }}" class="btn btn-success">
+                        <i class="fas fa-upload me-1"></i>Submit Payment
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
-    <!-- Student Info -->
-    <div class="section">
-        <h2>Student Information</h2>
-        <table>
-            <tr><th>Student Name:</th><td>{{ student.name }}</td></tr>
-            <tr><th>Student Number:</th><td>{{ student.student_number }}</td></tr>
-            <tr><th>Programme:</th><td>{{ registration.programme }}</td></tr>
-            <tr><th>Faculty:</th><td>{{ registration.faculty }}</td></tr>
-            <tr><th>Intake:</th><td>{{ registration.intake }}</td></tr>
-            <tr><th>Academic Year:</th><td>{{ registration.year }}</td></tr>
-            <tr><th>Semester:</th><td>{{ registration.semester }}</td></tr>
-        </table>
-    </div>
-
-    <!-- Payment Info -->
-    <div class="section">
-        <h2>Payment Information</h2>
-        <table>
-            <tr><th>Amount Paid:</th><td>ZMW {{ "{:,.2f}".format(payment.amount) if payment.amount else "0.00" }}</td></tr>
-            <tr><th>Payment Date:</th><td>{{ payment.submitted_date.strftime("%d %B %Y") }}</td></tr>
-            <tr><th>Payment Method:</th><td>{{ payment.method if payment.method else "Bank Transfer" }}</td></tr>
-            <tr><th>Reference:</th><td>{{ payment.reference if payment.reference else "N/A" }}</td></tr>
-            <tr><th>Status:</th><td><strong style="color: #28a745;">APPROVED</strong></td></tr>
-        </table>
-    </div>
-
-    <!-- Registration Slip Info -->
-    <div class="section">
-        <h2>Slip Details</h2>
-        <table>
-            <tr><th>Slip Number:</th><td>{{ slip.slip_number }}</td></tr>
-            <tr><th>Issued On:</th><td>{{ slip.issue_date.strftime("%d %B %Y") }}</td></tr>
-        </table>
-    </div>
-
-    <div class="footer">
-        <p>This is a system-generated registration slip. No signature is required.</p>
-        <a href="{{ url_for('student.student_dashboard') }}" class="back-btn">← Back to Dashboard</a>
-        <a href="{{ url_for('student.download_registration_slip') }}" class="pdf-btn">⬇ Download PDF Version</a>
-    </div>
-</div>
-
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

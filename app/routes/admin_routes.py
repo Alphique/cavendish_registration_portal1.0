@@ -80,22 +80,49 @@ def dashboard():
 @admin_bp.route('/payment/<int:payment_id>/<action>')
 @admin_required
 def manage_payment(payment_id, action):
+    """Approve or reject payments with auto-registration slip creation"""
     payment = Payment.query.get_or_404(payment_id)
 
     if action == 'approve':
         payment.status = 'approved'
         payment.approved_date = datetime.utcnow()
         
-        # Create registration record if it doesn't exist
+        # Create registration record
         registration = Registration.query.filter_by(student_id=payment.student_id).first()
         if not registration:
             registration = Registration(student_id=payment.student_id, is_registered=True)
             db.session.add(registration)
         else:
             registration.is_registered = True
+        
+        # AUTO-CREATE REGISTRATION SLIP
+        existing_slip = RegistrationSlip.query.filter_by(student_id=payment.student_id).first()
+        if not existing_slip:
+            slip_number = f"RS{payment.student_id:06d}-{datetime.now().strftime('%Y%m%d')}"
+            registration_slip = RegistrationSlip(
+                slip_number=slip_number,
+                student_id=payment.student_id,
+                program_name=payment.student.program or "To be assigned",
+                faculty_name=payment.student.faculty or "To be assigned",
+                academic_year="2024/2025",
+                semester="Semester 1",
+                issue_date=datetime.utcnow(),
+                created_by=session.get('user_id', 'admin')
+            )
+            db.session.add(registration_slip)
+            db.session.commit()
             
-        db.session.commit()
-        flash(f'Payment for {payment.student.name} approved and student registered.', 'success')
+            # Generate PDF
+            from app.utils.helpers import generate_registration_slip_pdf
+            if generate_registration_slip_pdf(registration_slip):
+                db.session.commit()
+                flash(f'Payment approved and registration slip created for {payment.student.name}!', 'success')
+            else:
+                flash(f'Payment approved but PDF generation failed for {payment.student.name}.', 'warning')
+        else:
+            # Slip already exists, just approve payment
+            db.session.commit()
+            flash(f'Payment for {payment.student.name} approved.', 'success')
 
     elif action == 'reject':
         payment.status = 'rejected'
@@ -116,49 +143,153 @@ def preview_payment(payment_id):
 # -----------------
 # Registration Slip Management
 # -----------------
-@admin_bp.route('/create_registration_slip/<int:student_id>')
+@admin_bp.route('/create_registration_slip_form', methods=['GET', 'POST'])
 @admin_required
-def create_registration_slip(student_id):
-    """Create a registration slip for a student (admin only)."""
-    student = Student.query.get_or_404(student_id)
+def create_registration_slip_form():
+    """Handle the complex registration form (manual creation)"""
+    if request.method == 'POST':
+        try:
+            student_number = request.form.get('student_number')
+            
+            # Find student
+            student = Student.query.filter_by(student_number=student_number).first()
+            if not student:
+                flash('Student not found!', 'danger')
+                return redirect(url_for('admin.create_registration_slip_form'))
+            
+            # Check if slip already exists
+            existing_slip = RegistrationSlip.query.filter_by(student_id=student.id).first()
+            if existing_slip:
+                flash(f'Registration slip already exists for {student.name}.', 'info')
+                return redirect(url_for('admin.view_registration_slips'))
+            
+            # Create registration slip with form data
+            slip_number = f"RS{student.id:06d}-{datetime.now().strftime('%Y%m%d')}"
+            registration_slip = RegistrationSlip(
+                slip_number=slip_number,
+                student_id=student.id,
+                program_name=request.form.get('program_name'),
+                faculty_name=request.form.get('faculty_name', student.faculty),
+                academic_year="2024/2025",
+                semester="Semester 1",
+                issue_date=datetime.utcnow(),
+                created_by=session.get('user_id', 'admin')
+            )
+            
+            db.session.add(registration_slip)
+            db.session.commit()
+            
+            # Generate PDF
+            from app.utils.helpers import generate_registration_slip_pdf
+            if generate_registration_slip_pdf(registration_slip):
+                db.session.commit()
+                flash(f'Registration slip created for {student.name}!', 'success')
+            else:
+                flash(f'Registration slip created but PDF generation failed for {student.name}.', 'warning')
+                
+            return redirect(url_for('admin.view_registration_slips'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error creating registration slip: {str(e)}', 'danger')
+            return redirect(url_for('admin.create_registration_slip_form'))
     
-    # Check if student has approved payment
-    approved_payment = Payment.query.filter_by(
-        student_id=student_id, 
-        status='approved'
-    ).first()
-    
-    if not approved_payment:
-        flash(f'Student {student.name} does not have an approved payment.', 'warning')
-        return redirect(url_for('admin.dashboard'))
-    
-    # Check if registration slip already exists
-    existing_slip = RegistrationSlip.query.filter_by(student_id=student_id).first()
-    if existing_slip:
-        flash(f'Registration slip already exists for {student.name}.', 'info')
-        return redirect(url_for('admin.dashboard'))
-    
-    # Create new registration slip
-    slip_number = f"RS{student_id:06d}"
-    registration_slip = RegistrationSlip(
-        slip_number=slip_number,
-        student_id=student_id,
-        issue_date=datetime.utcnow(),
-        created_by=session.get('user_id', 'admin')
-    )
-    
-    db.session.add(registration_slip)
-    db.session.commit()
-    
-    flash(f'Registration slip created for {student.name} (Slip #: {slip_number})', 'success')
-    return redirect(url_for('admin.dashboard'))
+    return render_template('admin/registration_slip.html')
 
 @admin_bp.route('/view_registration_slips')
 @admin_required
 def view_registration_slips():
-    """View all registration slips."""
-    registration_slips = RegistrationSlip.query.all()
-    return render_template('admin/registration_slips.html', slips=registration_slips)
+    """View all registration slips with statistics"""
+    registration_slips = RegistrationSlip.query.order_by(RegistrationSlip.issue_date.desc()).all()
+    
+    # Calculate statistics
+    today = datetime.utcnow().date()
+    today_count = len([slip for slip in registration_slips if slip.issue_date.date() == today])
+    
+    return render_template('admin/view_registration_slips.html', 
+                         slips=registration_slips,
+                         today_count=today_count)
+
+@admin_bp.route('/edit_registration_slip/<int:slip_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_registration_slip(slip_id):
+    """Edit an existing registration slip"""
+    slip = RegistrationSlip.query.get_or_404(slip_id)
+    
+    if request.method == 'POST':
+        try:
+            # Update slip information
+            slip.program_name = request.form.get('program_name', slip.program_name)
+            slip.faculty_name = request.form.get('faculty_name', slip.faculty_name)
+            slip.academic_year = request.form.get('academic_year', slip.academic_year)
+            slip.semester = request.form.get('semester', slip.semester)
+            
+            # Regenerate PDF with updated information
+            from app.utils.helpers import generate_registration_slip_pdf
+            if generate_registration_slip_pdf(slip):
+                db.session.commit()
+                flash('Registration slip updated successfully!', 'success')
+            else:
+                flash('Slip updated but PDF regeneration failed.', 'warning')
+                
+            return redirect(url_for('admin.view_registration_slips'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating registration slip: {str(e)}', 'danger')
+    
+    return render_template('admin/edit_registration_slip.html', slip=slip)
+
+@admin_bp.route('/regenerate_slip_pdf/<int:slip_id>')
+@admin_required
+def regenerate_slip_pdf(slip_id):
+    """Regenerate PDF for a registration slip"""
+    slip = RegistrationSlip.query.get_or_404(slip_id)
+    
+    try:
+        from app.utils.helpers import generate_registration_slip_pdf
+        if generate_registration_slip_pdf(slip):
+            db.session.commit()
+            flash('PDF regenerated successfully!', 'success')
+        else:
+            flash('PDF regeneration failed.', 'warning')
+    except Exception as e:
+        flash(f'Error regenerating PDF: {str(e)}', 'danger')
+    
+    return redirect(url_for('admin.view_registration_slips'))
+
+@admin_bp.route('/delete_registration_slip/<int:slip_id>')
+@admin_required
+def delete_registration_slip(slip_id):
+    """Delete a registration slip"""
+    slip = RegistrationSlip.query.get_or_404(slip_id)
+    student_name = slip.student.name
+    
+    try:
+        # Delete PDF file if it exists
+        if slip.pdf_filename:
+            pdf_path = os.path.join(current_app.config['REGISTRATION_SLIP_FOLDER'], slip.pdf_filename)
+            if os.path.exists(pdf_path):
+                os.remove(pdf_path)
+        
+        db.session.delete(slip)
+        db.session.commit()
+        flash(f'Registration slip for {student_name} deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting registration slip: {str(e)}', 'danger')
+    
+    return redirect(url_for('admin.view_registration_slips'))
+
+@admin_bp.route('/registration_slips/<filename>')
+@admin_required
+def serve_registration_slip(filename):
+    """Serve registration slip PDF files"""
+    return send_from_directory(
+        current_app.config['REGISTRATION_SLIP_FOLDER'],
+        filename,
+        as_attachment=False
+    )
 
 # -----------------
 # Student Management
