@@ -256,7 +256,7 @@
                                         {% if slip %}
                                             <span class="badge bg-success">Slip #{{ slip.slip_number }}</span>
                                         {% else %}
-                                            <a href="{{ url_for('admin.create_registration_slip', student_id=payment.student_id) }}" 
+                                            <a href="{{ url_for('admin.create_registration_slip_form') }}" 
                                                class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-file-contract me-1"></i>Create Slip
                                             </a>
