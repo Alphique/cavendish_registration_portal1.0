@@ -186,6 +186,23 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
         }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-logout:hover {
+            background: white;
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
         
         .upload-area {
             border: 2px dashed #ddd;
@@ -264,14 +281,21 @@
         <div class="dashboard-header">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 class="welcome-text">Welcome, {{ current_user.username }}!</h1>
+                    <!-- Modified welcome message to show student name -->
+                    <h1 class="welcome-text">Welcome, {{ student.name }}!</h1>
                     <p class="welcome-subtext">Here's an overview of your academic information and payments</p>
                 </div>
-                <div class="d-none d-md-block">
-                    <div class="bg-white text-primary p-3 rounded-pill">
-                        <i class="fas fa-user-graduate me-2"></i>
-                        Student Portal
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-none d-md-block">
+                        <div class="bg-white text-primary p-3 rounded-pill">
+                            <i class="fas fa-user-graduate me-2"></i>
+                            Student Portal
+                        </div>
                     </div>
+                    <!-- Added logout button -->
+                    <a href="{{ url_for('student.student_logout') }}" class="btn btn-logout">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
                 </div>
             </div>
         </div>
