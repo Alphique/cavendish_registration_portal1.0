@@ -38,13 +38,28 @@ def student_login():
         student_number = request.form.get('student_number')
         password = request.form.get('password')
 
-        user = User.query.filter_by(username=student_number, role='student').first()
-        if user and user.check_password(password):
-            session['student_id'] = user.student_id
-            flash("Login successful!", "success")
-            return redirect(url_for('student.student_dashboard'))
-        else:
-            flash("Invalid student number or password", "danger")
+        user = User.query.filter_by(
+            username=student_number,
+            role='student'
+        ).first()
+
+        if not user:
+            flash("Account not found", "danger")
+            return render_template('student/login.html')
+
+        if not user.check_password(password):
+            flash("Wrong password", "danger")
+            return render_template('student/login.html')
+
+        # 🔥 IMPORTANT: verify student exists
+        student = Student.query.get(user.student_id)
+        if not student:
+            flash("Student profile missing. Contact admin.", "danger")
+            return render_template('student/login.html')
+
+        session['student_id'] = student.id
+        flash("Login successful!", "success")
+        return redirect(url_for('student.student_dashboard'))
 
     return render_template('student/login.html')
 
