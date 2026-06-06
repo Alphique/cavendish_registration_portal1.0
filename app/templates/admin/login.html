@@ -3,389 +3,426 @@
 {% block title %}Admin Login - Cavendish University{% endblock %}
 
 {% block content %}
-<div class="container-fluid admin-login-container">
-    <!-- Admin Utility Bar -->
-    <div class="admin-utility-bar">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center py-2">
-                <div class="text-white small">
-                    <i class="fas fa-shield-alt me-1"></i>
-                    Secure Admin Portal
-                </div>
-                <div class="admin-actions">
-                    <a href="{{ url_for('admin.create_admin') }}" class="btn btn-outline-light btn-sm me-2">
-                        <i class="fas fa-user-plus me-1"></i>Create Admin
-                    </a>
-                    <a href="{{ url_for('admin.manage_admins') }}" class="btn btn-outline-light btn-sm">
-                        <i class="fas fa-users-cog me-1"></i>Manage Admins
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row align-items-center min-vh-100">
-        <!-- Left side - Admin Graphics Section -->
-        <div class="col-lg-6 d-none d-lg-block admin-image-section" 
-             style="background: linear-gradient(rgba(13, 36, 83, 0.85), rgba(25, 55, 109, 0.9)), url('{{ url_for('static', filename='images/cavendish1.png') }}'); 
+<div class="container-fluid admin-login-container p-0">
+    <div class="row g-0 min-vh-100">
+        <!-- Left side - Full background image section -->
+        <div class="col-lg-7 d-none d-lg-flex admin-hero-section position-relative" 
+             style="background: linear-gradient(135deg, rgba(13, 36, 83, 0.94) 0%, rgba(20, 48, 99, 0.9) 100%), url('{{ url_for('static', filename='images/cavendish1.png') }}'); 
                     background-size: cover; 
-                    background-position: center;">
-            <div class="admin-graphics-placeholder">
-                <div class="admin-badge">
-                    <div class="badge-icon admin-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" fill="currentColor" class="bi bi-shield-lock" viewBox="0 0 16 16">
-                            <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.159 0 0 1-1.048-.625 11.777 11.775 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
-                            <path d="M9.5 6.5a1.5 1.5 0 0 1-1 1.415l.385 1.99a.5.5 0 0 1-.491.595h-.788a.5.5 0 0 1-.49-.595l.384-1.99a1.5 1.5 0 1 1 2-1.415z"/>
+                    background-position: center 30%;">
+            
+            <!-- Floating content over image -->
+            <div class="hero-content-overlay">
+                <div class="cavendish-branding mb-4">
+                    <div class="brand-icon mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-shield-lock-fill" viewBox="0 0 16 16" style="color: #4a90e2;">
+                            <path d="M8 0c-.69 0-1.843.265-2.928.56-1.11.3-2.229.655-2.887.87a1.54 1.54 0 0 0-1.044 1.262c-.596 4.477.787 7.795 2.465 9.99a11.777 11.777 0 0 0 2.517 2.453c.386.273.744.482 1.048.625.28.132.581.24.829.24s.548-.108.829-.24a7.159 7.159 0 0 0 1.048-.625 11.775 11.775 0 0 0 2.517-2.453c1.678-2.195 3.061-5.513 2.465-9.99a1.54 1.54 0 0 0-1.044-1.263 62.439 62.439 0 0 0-2.887-.87C9.843.266 8.69 0 8 0z"/>
                         </svg>
                     </div>
-                    <h3>Administrator Access</h3>
-                    <p class="m-0">Cavendish University Management System</p>
+                    <h1 class="display-5 fw-bold text-white mb-2 tracking-tight">Cavendish University</h1>
+                    <p class="lead text-white-50 small text-uppercase tracking-wider">Administrator Security Portal</p>
                 </div>
-                <div class="graphics-text">
-                    <h2>Secure Admin Portal</h2>
-                    <p>Manage student registrations, payment verifications, and system administration with elevated security protocols.</p>
-                    <div class="security-features">
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle me-2 text-success"></i>
-                            Multi-factor authentication ready
+                
+                <div class="security-stats mt-5">
+                    <div class="stat-item mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon-box"><i class="fas fa-shield-alt"></i></div>
+                            <div>
+                                <h6 class="text-white mb-0 small fw-bold">256-bit Encryption</h6>
+                                <small class="text-white-50 extra-small">End-to-end secure transmission</small>
+                            </div>
                         </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle me-2 text-success"></i>
-                            Encrypted data transmission
+                    </div>
+                    <div class="stat-item mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon-box"><i class="fas fa-clock"></i></div>
+                            <div>
+                                <h6 class="text-white mb-0 small fw-bold">Session Timeout: 30 min</h6>
+                                <small class="text-white-50 extra-small">Automatic logout on inactivity</small>
+                            </div>
                         </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle me-2 text-success"></i>
-                            Activity monitoring & logging
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle me-2 text-success"></i>
-                            Admin account management
+                    </div>
+                    <div class="stat-item mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon-box"><i class="fas fa-clipboard-list"></i></div>
+                            <div>
+                                <h6 class="text-white mb-0 small fw-bold">Audit Logging</h6>
+                                <small class="text-white-50 extra-small">All system actions are permanently recorded</small>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <div class="image-credit">
+                <small class="text-white-50">Cavendish University Campus</small>
             </div>
         </div>
         
-        <!-- Right side - Login Form -->
-        <div class="col-lg-6 col-md-12">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-10">
-                    <div class="card admin-login-card shadow-lg border-0">
-                        <div class="card-header bg-dark text-white text-center py-4 border-0">
-                            <div class="admin-header-icon mb-3">
-                                <i class="fas fa-user-shield fa-2x"></i>
+        <!-- Right side - Structured Premium Card Form Over Soft Gray -->
+        <div class="col-lg-5 col-md-12 d-flex flex-column align-items-center justify-content-center form-pane-bg px-3">
+            
+            <!-- Dynamic Form Wrapper Containment Cell -->
+            <div class="login-form-wrapper-premium my-auto">
+                
+                <!-- Micro Utility Bar Embedded directly above card bounds -->
+                <div class="utility-links mb-3 d-flex justify-content-end">
+                    <a href="{{ url_for('admin.create_admin') }}" class="nav-sub-link me-3">
+                        <i class="fas fa-user-plus me-1"></i>Create Admin
+                    </a>
+                    <a href="{{ url_for('admin.manage_admins') }}" class="nav-sub-link">
+                        <i class="fas fa-users-cog me-1"></i>Manage Admins
+                    </a>
+                </div>
+
+                <!-- Structured White Content Base Card -->
+                <div class="auth-surface-card">
+                    
+                    <div class="mb-4 text-center header-cluster">
+                        <div class="admin-icon-circle mx-auto mb-3">
+                            <i class="fas fa-user-shield fa-lg text-primary-blue"></i>
+                        </div>
+                        <h3 class="fw-bold text-dark-navy mb-1 fs-4">Administrator Access</h3>
+                        <p class="text-muted extra-small text-uppercase tracking-wider fw-semibold m-0">Restricted secure zone</p>
+                    </div>
+
+                    <!-- Flashed Message Injection Layer -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-custom border-0 shadow-sm alert-{{ category }} alert-dismissible fade show mb-4" role="alert">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-{% if category == 'success' %}check-circle text-success{% else %}exclamation-triangle text-danger{% endif %} me-2"></i>
+                                        <small class="fw-medium text-dark">{{ message }}</small>
+                                    </div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Core Input Engine Architecture -->
+                    <form method="POST" action="{{ url_for('admin.admin_login') }}" class="needs-validation" novalidate>
+                        <div class="mb-3.5">
+                            <label for="username" class="form-label-premium">Username</label>
+                            <div class="input-group input-group-premium">
+                                <span class="input-group-text-premium">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input 
+                                    type="text" 
+                                    id="username" 
+                                    name="username" 
+                                    class="form-control-premium" 
+                                    placeholder="Enter your username" 
+                                    required
+                                >
                             </div>
-                            <h2 class="mb-0">Administrator Login</h2>
-                            <p class="mb-0 mt-2 opacity-75">Restricted Access - Authorized Personnel Only</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="password" class="form-label-premium mb-0">Password</label>
+                                <a href="#" class="text-decoration-none extra-small text-muted-blue fw-medium">Forgot password?</a>
+                            </div>
+                            <div class="input-group input-group-premium">
+                                <span class="input-group-text-premium">
+                                    <i class="fas fa-key"></i>
+                                </span>
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password" 
+                                    class="form-control-premium border-end-0" 
+                                    placeholder="Enter your password" 
+                                    required
+                                >
+                                <button class="btn-toggle-password-premium" type="button" id="togglePassword">
+                                    <i class="fas fa-eye text-muted"></i>
+                                </button>
+                            </div>
                         </div>
                         
-                        <div class="card-body p-5">
-                            <div class="access-warning alert alert-warning d-flex align-items-center mb-4">
-                                <i class="fas fa-exclamation-triangle me-2 flex-shrink-0"></i>
-                                <div>
-                                    <strong>Security Notice:</strong> This area contains sensitive information. Unauthorized access is prohibited.
-                                </div>
-                            </div>
-
-                            {% with messages = get_flashed_messages(with_categories=true) %}
-                                {% if messages %}
-                                    {% for category, message in messages %}
-                                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                            <div class="d-flex align-items-center">
-                                                <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-triangle{% endif %} me-2"></i>
-                                                {{ message }}
-                                            </div>
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-                            {% endwith %}
-
-                            <form method="POST" action="{{ url_for('admin.admin_login') }}" class="needs-validation" novalidate>
-                                <div class="mb-4">
-                                    <label for="username" class="form-label fw-semibold">Administrator Username</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light">
-                                            <i class="fas fa-user-cog"></i>
-                                        </span>
-                                        <input 
-                                            type="text" 
-                                            id="username" 
-                                            name="username" 
-                                            class="form-control form-control-lg" 
-                                            placeholder="Enter administrator username" 
-                                            required
-                                        >
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="password" class="form-label fw-semibold">Password</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light">
-                                            <i class="fas fa-key"></i>
-                                        </span>
-                                        <input 
-                                            type="password" 
-                                            id="password" 
-                                            name="password" 
-                                            class="form-control form-control-lg" 
-                                            placeholder="Enter secure password" 
-                                            required
-                                        >
-                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div class="d-grid mb-4">
-                                    <button type="submit" class="btn btn-dark btn-lg py-3 fw-semibold">
-                                        <i class="fas fa-shield-check me-2"></i>
-                                        Authenticate & Login
-                                    </button>
-                                </div>
-                            </form>
-
-                            <!-- Admin Management Links -->
-                            <div class="admin-management-links mt-4">
-                                <div class="row g-2">
-                                    <div class="col-md-6">
-                                        <a href="{{ url_for('admin.create_admin') }}" class="btn btn-outline-primary w-100">
-                                            <i class="fas fa-user-plus me-2"></i>
-                                            Create Admin Account
-                                        </a>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <a href="{{ url_for('admin.manage_admins') }}" class="btn btn-outline-secondary w-100">
-                                            <i class="fas fa-users-cog me-2"></i>
-                                            Manage Admins
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="text-center mt-4">
-                                <p class="text-muted small mb-0">
-                                    <i class="fas fa-clock-history me-1"></i>
-                                    Session timeout: 30 minutes of inactivity
-                                </p>
-                            </div>
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn-premium-submit py-3 fw-semibold">
+                                <span>Sign In to Portal</span>
+                                <i class="fas fa-arrow-right ms-2 fs-7 transition-arrow"></i>
+                            </button>
                         </div>
-                    </div>
-                    
-                    <div class="text-center mt-4">
-                        <p class="text-muted small">
-                            For security emergencies, contact 
-                            <a href="#" class="text-decoration-none fw-bold">IT Security Department</a>
-                        </p>
-                    </div>
+                        
+                        <div class="security-badge-tray text-center pt-2">
+                            <span class="badge-secure-text">
+                                <i class="fas fa-lock me-1"></i> Secure end-to-end processing session active
+                            </span>
+                        </div>
+                    </form>
                 </div>
+            </div>
+            
+            <div class="pane-footer py-3 text-center w-100">
+                <small class="extra-small text-muted">&copy; 2026 Cavendish University Systems Security Node</small>
             </div>
         </div>
     </div>
 </div>
 
 <style>
+    /* Strict Pure Palette Variables */
+    :root {
+        --bg-pane-gray: #f4f6f9;      /* Eliminates raw white void space */
+        --card-white: #ffffff;        /* Crisp element surface encapsulation */
+        --navy-dark: #0d2453;         /* Matches Cavendish primary branding */
+        --blue-accent: #1a4a6e;       /* Deep modern blue for actions */
+        --blue-light-tint: #e8f0fe;   /* Light focus states */
+        --border-gray: #e2e8f0;       /* Fine line segmentation styling */
+        --text-dark: #1e293b;
+        --text-muted: #64748b;
+    }
+
     .admin-login-container {
-        background: linear-gradient(135deg, #0d2453 0%, #1a3a7a 100%);
+        background: var(--bg-pane-gray);
         min-height: 100vh;
-        padding-top: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
     }
     
-    .admin-utility-bar {
-        background: rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(10px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .admin-utility-bar .btn {
-        font-size: 0.8rem;
-        padding: 0.25rem 0.75rem;
-    }
-    
-    .admin-image-section {
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
+    /* Left Side Branding Mechanics */
+    .hero-content-overlay {
         position: relative;
+        z-index: 2;
+        padding: 5rem 4.5rem;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100vh;
     }
     
-    .admin-graphics-placeholder {
-        text-align: center;
-        max-width: 80%;
+    .brand-icon {
+        background: rgba(255, 255, 255, 0.08);
+        display: inline-flex;
+        padding: 1.15rem;
+        border-radius: 16px;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        width: max-content;
     }
     
-    .admin-badge {
-        margin-bottom: 3rem;
+    .tracking-tight { letter-spacing: -0.02em; }
+    .tracking-wider { letter-spacing: 0.06em; }
+    .extra-small { font-size: 0.725rem; }
+    .mb-3\.5 { margin-bottom: 1.15rem; }
+    
+    .security-stats { max-width: 380px; }
+    
+    .stat-item {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(8px);
+        padding: 0.95rem 1.2rem;
+        border-radius: 14px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid rgba(255, 255, 255, 0.07);
     }
     
-    .badge-icon.admin-icon {
-        background: rgba(255, 255, 255, 0.15);
+    .stat-item:hover {
+        background: rgba(255, 255, 255, 0.09);
+        border-color: rgba(255, 255, 255, 0.15);
+        transform: translateX(4px);
+    }
+
+    .stat-icon-box {
+        width: 32px;
+        color: #4a90e2;
+        font-size: 1.1rem;
+    }
+    
+    .image-credit {
+        position: absolute;
+        bottom: 24px;
+        left: 4.5rem;
+        z-index: 2;
+        background: rgba(13, 36, 83, 0.6);
+        padding: 4px 14px;
+        border-radius: 30px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* Right Side - Structure, Balance & Depth Fixes */
+    .form-pane-bg {
+        background-color: var(--bg-pane-gray);
+        border-left: 1px solid var(--border-gray);
+    }
+
+    .login-form-wrapper-premium {
+        max-width: 440px;
+        width: 100%;
+        padding: 1.5rem 0;
+    }
+
+    .auth-surface-card {
+        background: var(--card-white);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 20px;
+        padding: 2.75rem 2.5rem;
+        box-shadow: 0 15px 35px rgba(13, 36, 83, 0.04), 0 5px 15px rgba(0, 0, 0, 0.02);
+    }
+
+    .admin-icon-circle {
+        width: 60px;
+        height: 60px;
+        background: #f0f4f8;
         border-radius: 50%;
-        width: 140px;
-        height: 140px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1.5rem;
-        border: 3px solid rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(10px);
+        border: 1px solid var(--border-gray);
     }
     
-    .graphics-text h2 {
+    .text-primary-blue { color: var(--navy-dark); }
+    .text-dark-navy { color: #0f172a; }
+    .text-muted-blue { color: var(--blue-accent); }
+    .text-muted-blue:hover { text-decoration: underline !important; }
+
+    /* Form Fields Styling Upgrade */
+    .form-label-premium {
+        color: var(--text-dark);
+        font-size: 0.775rem;
         font-weight: 700;
-        margin-bottom: 1.5rem;
-        font-size: 2.5rem;
+        text-uppercase: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.45rem;
+        display: block;
     }
-    
-    .graphics-text p {
-        font-size: 1.2rem;
-        opacity: 0.9;
-        line-height: 1.6;
-        margin-bottom: 2rem;
+
+    .input-group-premium {
+        border: 1px solid var(--border-gray);
+        border-radius: 10px;
+        background: #f8fafc;
+        transition: all 0.25s ease;
+        overflow: hidden;
     }
-    
-    .security-features {
-        text-align: left;
-        max-width: 400px;
-        margin: 0 auto;
+
+    .input-group-premium:focus-within {
+        border-color: #4a90e2;
+        background: var(--card-white);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.12);
     }
-    
-    .feature-item {
-        margin-bottom: 0.75rem;
-        font-size: 1rem;
-        opacity: 0.9;
+
+    .input-group-text-premium {
+        background: transparent;
+        border: none;
+        padding-left: 14px;
+        padding-right: 10px;
+        color: var(--text-muted);
         display: flex;
         align-items: center;
     }
-    
-    .admin-login-card {
-        border-radius: 1rem;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        margin-top: 2rem;
+
+    .form-control-premium {
+        border: none !important;
+        background: transparent !important;
+        padding: 0.75rem 12px 0.75rem 4px;
+        font-size: 0.925rem;
+        color: var(--text-dark);
+        width: 100%;
     }
-    
-    .card-header {
-        border-radius: 1rem 1rem 0 0 !important;
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+
+    .form-control-premium:focus {
+        outline: none;
     }
-    
-    .admin-header-icon {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        width: 80px;
-        height: 80px;
+
+    .btn-toggle-password-premium {
+        background: transparent;
+        border: none;
+        padding-right: 14px;
+        display: flex;
+        align-items: center;
+        transition: color 0.2s;
+    }
+    .btn-toggle-password-premium:hover i {
+        color: var(--text-dark) !important;
+    }
+
+    /* Primary Action Element Button */
+    .btn-premium-submit {
+        background: linear-gradient(135deg, var(--blue-accent) 0%, var(--navy-dark) 100%);
+        border: none;
+        color: var(--card-white);
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto;
-        border: 2px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 4px 12px rgba(13, 36, 83, 0.15);
     }
     
-    .access-warning {
-        border-left: 4px solid #f39c12;
-        background: #fef5e7;
-    }
-    
-    .form-control:focus {
-        border-color: #2c3e50;
-        box-shadow: 0 0 0 0.25rem rgba(44, 62, 80, 0.25);
-    }
-    
-    .btn-dark {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-        border: none;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-dark:hover {
-        background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
-        transform: translateY(-2px);
-    }
-    
-    .admin-management-links .btn {
-        transition: all 0.3s ease;
-    }
-    
-    .admin-management-links .btn:hover {
+    .btn-premium-submit:hover {
         transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(13, 36, 83, 0.25);
+        filter: brightness(1.05);
     }
     
+    .btn-premium-submit:hover .transition-arrow {
+        transform: translateX(3px);
+    }
+    
+    .transition-arrow { transition: transform 0.2s ease; }
+
+    /* Nav sub links */
+    .nav-sub-link {
+        color: var(--text-muted) !important;
+        text-decoration: none;
+        font-size: 0.785rem;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+    .nav-sub-link:hover {
+        color: var(--navy-dark) !important;
+    }
+
+    .badge-secure-text {
+        font-size: 0.725rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .alert-custom {
+        background: #f8fafc;
+        border-left: 3px solid var(--text-muted) !important;
+        border-radius: 8px;
+    }
+    
+    /* Responsive Adjustments */
     @media (max-width: 991.98px) {
-        .admin-image-section {
-            display: none;
-        }
-        
-        .admin-login-container {
-            padding: 1rem 0;
-        }
-        
-        .card-body {
-            padding: 2rem !important;
-        }
-        
-        .admin-login-card {
-            background: white;
-            margin-top: 1rem;
-        }
-        
-        .admin-utility-bar {
-            position: relative;
-        }
-        
-        .admin-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .admin-actions .btn {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.5rem;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .admin-management-links .btn {
-            font-size: 0.8rem;
-        }
-        
-        .card-body {
-            padding: 1.5rem !important;
-        }
+        .form-pane-bg { border-left: none; background-color: var(--bg-pane-gray); }
+        .hero-content-overlay { padding: 3rem 2rem; min-height: auto; }
+        .login-form-wrapper-premium { padding: 3rem 1rem; }
+        .auth-surface-card { padding: 2.25rem 1.75rem; }
     }
 </style>
 
 <script>
-    // Password visibility toggle
-    document.getElementById('togglePassword').addEventListener('click', function() {
-        const passwordInput = document.getElementById('password');
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        
-        // Toggle eye icon
-        const icon = this.querySelector('i');
-        if (type === 'text') {
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    });
-
-    // Auto-focus username field
     document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('username').focus();
+        const passwordInput = document.getElementById('password');
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const usernameInput = document.getElementById('username');
+
+        if(usernameInput) usernameInput.focus();
+
+        if (togglePasswordBtn && passwordInput) {
+            togglePasswordBtn.addEventListener('click', function() {
+                const isPassword = passwordInput.getAttribute('type') === 'password';
+                passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+                
+                const icon = this.querySelector('i');
+                if (isPassword) {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
     });
 </script>
 {% endblock %}

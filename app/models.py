@@ -40,6 +40,7 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"<User {self.username} ({self.role})>"
 
+
 # --------------------
 # STUDENT MODEL
 # --------------------
@@ -52,10 +53,10 @@ class Student(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=True)
     phone = db.Column(db.String(20), nullable=True)
     program = db.Column(db.String(50), nullable=True)
-    faculty = db.Column(db.String(100), nullable=True)  # NEW: Added faculty field
+    faculty = db.Column(db.String(100), nullable=True)
     intake_year = db.Column(db.Integer, nullable=True)
     year_of_study = db.Column(db.Integer, nullable=True)
-    semester = db.Column(db.String(20), nullable=True)  # NEW: Added semester field
+    semester = db.Column(db.String(20), nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationships
@@ -63,17 +64,27 @@ class Student(db.Model):
     payments = db.relationship("Payment", back_populates="student", lazy=True, cascade="all, delete-orphan")
     registrations = db.relationship("Registration", back_populates="student", lazy=True, cascade="all, delete-orphan")
     registration_slips = db.relationship("RegistrationSlip", back_populates="student", lazy=True, cascade="all, delete-orphan")
+    
+    # Academic registrations (from models_academics.py)
+    # Using backref from StudentRegistration, no need to define here
 
     @property
     def registration_slip(self):
         """Convenience property to get the latest registration slip"""
         return self.registration_slips[0] if self.registration_slips else None
 
+    @property
+    def current_academic_registration(self):
+        """Get the most recent academic registration"""
+        from app.models_academics import StudentRegistration
+        return StudentRegistration.query.filter_by(student_id=self.id).order_by(StudentRegistration.id.desc()).first()
+
     def __repr__(self):
         return f"<Student {self.student_number} - {self.name}>"
 
+
 # --------------------
-# PAYMENT MODEL (UPDATED)
+# PAYMENT MODEL
 # --------------------
 class Payment(db.Model):
     __tablename__ = "payment"
@@ -89,8 +100,8 @@ class Payment(db.Model):
     # Payment details (for registration slip)
     amount = db.Column(db.Float, nullable=True)
     method = db.Column(db.String(50), nullable=True)
-    reference = db.Column(db.String(100), nullable=True, unique=True)  # Made unique
-    receipt_image = db.Column(db.String(255), nullable=True)  # NEW: Store receipt image filename
+    reference = db.Column(db.String(100), nullable=True, unique=True)
+    receipt_image = db.Column(db.String(255), nullable=True)
 
     # Relationships
     student = db.relationship("Student", back_populates="payments")
@@ -98,8 +109,9 @@ class Payment(db.Model):
     def __repr__(self):
         return f"<Payment {self.id} - {self.status} - {self.reference}>"
 
+
 # --------------------
-# REGISTRATION SLIP MODEL (UPDATED)
+# REGISTRATION SLIP MODEL
 # --------------------
 class RegistrationSlip(db.Model):
     __tablename__ = "registration_slip"
@@ -124,6 +136,7 @@ class RegistrationSlip(db.Model):
     def __repr__(self):
         return f"<RegistrationSlip {self.slip_number} - {self.student.name}>"
 
+
 # --------------------
 # CHATBOT MESSAGE MODEL
 # --------------------
@@ -140,15 +153,16 @@ class ChatbotMessage(db.Model):
     def __repr__(self):
         return f'<ChatbotMessage {self.question}>'
 
+
 # --------------------
-# REGISTRATION MODEL (UPDATED)
+# REGISTRATION MODEL (Legacy - kept for compatibility)
 # --------------------
 class Registration(db.Model):
     __tablename__ = "registration"
     
     id = db.Column(db.Integer, primary_key=True)
     semester = db.Column(db.String(50), default="Current Semester")
-    academic_year = db.Column(db.String(20), nullable=True)  # NEW: Added academic year
+    academic_year = db.Column(db.String(20), nullable=True)
     registration_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     is_registered = db.Column(db.Boolean, default=False)
     student_id = db.Column(db.Integer, db.ForeignKey("student.id"), nullable=False)
@@ -159,8 +173,9 @@ class Registration(db.Model):
     def __repr__(self):
         return f"<Registration {self.student_id} - {self.semester}>"
 
+
 # --------------------
-# SYSTEM LOG MODEL (NEW - for admin activity tracking)
+# SYSTEM LOG MODEL
 # --------------------
 class SystemLog(db.Model):
     __tablename__ = "system_log"

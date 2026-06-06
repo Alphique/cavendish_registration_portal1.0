@@ -1,627 +1,425 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cavendish University Registration Portal</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-blue: #1a237e;
-            --primary-dark: #0d2453;
-            --primary-light: #3f51b5;
-            --accent-green: #4caf50;
-            --accent-dark-green: #388e3c;
-            --text-light: #ffffff;
-            --text-dark: #333333;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Registration Portal | Cavendish University</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..300,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "primary": "#00255a",
+              "secondary": "#365da3",
+              "background": "#faf9fe",
+              "surface": "#faf9fe",
+              "surface-variant": "#e3e2e7",
+              "on-surface": "#1a1b1f",
+              "on-surface-variant": "#44474f",
+              "inverse-surface": "#2f3034",
+              "inverse-on-surface": "#f1f0f5",
+              "outline": "#747781",
+              "outline-variant": "#c4c6d1",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#f4f3f8",
+              "surface-container": "#eeedf2",
+              "surface-container-high": "#e9e7ed",
+              "surface-container-highest": "#e3e2e7",
+              "surface-tint": "#425d95",
+              "primary-container": "#1e3c72",
+              "on-primary-container": "#8da8e5",
+              "secondary-container": "#8fb3ff",
+              "on-secondary-container": "#174388",
+              "error": "#ba1a1a",
+              "error-container": "#ffdad6",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "2xl": "1.25rem",
+              "3xl": "1.5rem",
+              "full": "9999px"
+            },
+            "spacing": {
+              "xs": "4px",
+              "sm": "8px",
+              "md": "16px",
+              "lg": "24px",
+              "xl": "32px",
+              "2xl": "48px",
+              "3xl": "64px",
+              "container-max": "1280px",
+              "gutter": "24px"
+            },
+            "fontFamily": {
+              "inter": ["Inter"],
+              "display-lg": ["Inter"],
+              "body-md": ["Inter"],
+              "title-lg": ["Inter"],
+              "label-md": ["Inter"],
+              "body-lg": ["Inter"],
+              "headline-md": ["Inter"],
+              "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+              "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+              "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+              "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+              "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+              "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+              "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+              "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+              "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0d2453 0%, #1a3a7a 100%);
-            color: var(--text-dark);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
+        .hero-mesh {
+            background: linear-gradient(135deg, #00255a 0%, #1e3c72 100%);
             position: relative;
-            overflow-x: hidden;
         }
-
-        /* Background image covering the blue section */
-        body::before {
+        .hero-mesh::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: url("{{ url_for('static', filename='images/cavendish2.png') }}") center/cover;
-            opacity: 0.1;
-            z-index: -1;
-        }
-
-        .landing-container {
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header Styles */
-        .main-header {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
-            color: var(--text-light);
-            padding: 1rem 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .main-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("{{ url_for('static', filename='images/cavendish2.png') }}") center/cover;
-            opacity: 0.15;
+            background: url("{{ url_for('static', filename='images/logo3.png') }}") center/cover;
+            opacity: 0.05;
             z-index: 1;
         }
-
-        .header-content {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
+        .premium-shadow {
+            box-shadow: 0 20px 40px -15px rgba(0, 37, 90, 0.1);
         }
-
+        .btn-hover-effect {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-hover-effect:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px -4px rgba(0, 37, 90, 0.25);
+        }
+        @keyframes subtle-drift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+        .animate-drift {
+            background-size: 200% 200%;
+            animation: subtle-drift 20s ease-infinite;
+        }
+        .portal-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .portal-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -12px rgba(0, 37, 90, 0.2);
+        }
+        .logo-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
         .university-logo {
-            height: 60px;
+            height: 50px;
             width: auto;
-            /* Remove filter properties that were causing white overlay */
-            transition: all 0.3s ease;
-            border-radius: 8px;
+            transition: transform 0.3s ease;
         }
-
         .university-logo:hover {
             transform: scale(1.05);
         }
-
-        .university-title {
-            text-align: left;
-        }
-
-        .university-title h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin: 0;
-            background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .university-title .tagline {
-            font-size: 1rem;
-            opacity: 0.9;
-            margin: 0.25rem 0 0 0;
-            font-weight: 300;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-            opacity: 0.9;
-        }
-
-        .nav-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            opacity: 1;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-
-        .hero-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 1000px;
-            width: 100%;
-        }
-
-        .hero-header {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
-            color: var(--text-light);
-            padding: 2.5rem 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-
         .hero-logo {
             height: 80px;
             width: auto;
             margin-bottom: 1rem;
-            /* Remove filter properties */
-            border-radius: 8px;
         }
-
-        .hero-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 0;
-            font-weight: 300;
-        }
-
-        .content-section {
-            padding: 3rem 2.5rem;
-        }
-
-        .welcome-text {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .welcome-text h2 {
-            color: var(--primary-dark);
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .welcome-text p {
-            font-size: 1.1rem;
-            color: #666;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .portal-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .portal-card {
-            background: white;
-            border-radius: 15px;
-            padding: 2.5rem 2rem;
-            text-align: center;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .portal-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
-        }
-
-        .portal-card.admin::before {
-            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-dark-green) 100%);
-        }
-
-        .portal-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .card-icon {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 1.5rem;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .portal-card.admin .card-icon {
-            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-dark-green) 100%);
-        }
-
-        .portal-card h3 {
-            color: var(--primary-dark);
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .portal-card p {
-            color: #666;
-            margin-bottom: 2rem;
-            line-height: 1.5;
-            font-size: 0.95rem;
-        }
-
-        .btn-portal {
-            padding: 12px 30px;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 50px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-student {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
-            color: white;
-        }
-
-        .btn-student:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(63, 81, 181, 0.3);
-            color: white;
-        }
-
-        .btn-admin {
-            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-dark-green) 100%);
-            color: white;
-        }
-
-        .btn-admin:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
-            color: white;
-        }
-
-        .features-section {
-            background: rgba(13, 36, 83, 0.05);
-            border-radius: 15px;
-            padding: 2rem;
-            margin-top: 2.5rem;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            text-align: center;
-        }
-
-        .feature-item {
-            padding: 1.5rem;
-        }
-
-        .feature-icon {
-            width: 50px;
-            height: 50px;
-            margin: 0 auto 1rem;
-            background: var(--primary-blue);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .feature-item h4 {
-            color: var(--primary-dark);
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        .feature-item p {
-            color: #666;
-            font-size: 0.9rem;
-            margin: 0;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 2.5rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            color: #666;
-        }
-
         .footer-logo {
-            height: 30px;
+            height: 35px;
             width: auto;
-            margin-bottom: 1rem;
             opacity: 0.7;
-            /* Remove filter for footer logo too */
-        }
-
-        /* If logo still has white background, add these styles */
-        .logo-container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 5px;
-            border-radius: 8px;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Alternative: If logo has transparent background but still shows white */
-        .logo-fix {
-            mix-blend-mode: multiply;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
-
-            .logo-section {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .university-title {
-                text-align: center;
-            }
-
-            .university-title h1 {
-                font-size: 1.8rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .hero-title {
-                font-size: 2rem;
-            }
-            
-            .hero-subtitle {
-                font-size: 1.1rem;
-            }
-            
-            .content-section {
-                padding: 2rem 1.5rem;
-            }
-            
-            .portal-cards {
-                grid-template-columns: 1fr;
-            }
-            
-            .features-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .hero-logo {
-                height: 60px;
-            }
-
-            .university-logo {
-                height: 50px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 1.8rem;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .main-content {
-                padding: 1rem;
-            }
-            
-            .hero-header {
-                padding: 2rem 1.5rem;
-            }
-            
-            .hero-logo {
-                height: 50px;
-            }
-
-            .main-header {
-                padding: 1rem;
-            }
         }
     </style>
 </head>
-<body>
-    <div class="landing-container">
-        <!-- Main Header -->
-        <header class="main-header">
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="logo-container">
-                        <img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Cavendish University Logo" class="university-logo logo-fix">
-                    </div>
-                    <div class="university-title">
-                        <h1>Cavendish University</h1>
-                        <p class="tagline">STUDENT REGISTRATION PORTAL</p>
-                    </div>
-                </div>
-                <nav class="nav-links">
-                    <a href="{{ url_for('student.student_login') }}" class="nav-link">Student Portal</a>
-                    <a href="{{ url_for('admin.admin_login') }}" class="nav-link">Admin Portal</a>
-                    <a href="#" class="nav-link">Contact</a>
-                </nav>
-            </div>
-        </header>
+<body class="bg-background text-on-surface">
+<!-- Top Navigation Bar -->
+<header class="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-md border-b border-outline-variant/30">
+<div class="flex items-center justify-between px-md py-3 max-w-container-max mx-auto">
+<div class="flex items-center gap-sm">
+<div class="logo-container">
+<img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Cavendish University Logo" class="university-logo">
+</div>
+<div class="flex flex-col leading-tight">
+<h1 class="font-bold text-xl tracking-tight text-primary">Cavendish</h1>
+<span class="text-[10px] uppercase tracking-widest text-secondary font-bold">University</span>
+</div>
+</div>
+<nav class="hidden md:flex items-center gap-xl">
+<a href="{{ url_for('student.student_dashboard') }}" class="text-on-surface-variant font-medium text-label-md hover:text-primary transition-colors">Student Dashboard</a>
+<a href="{{ url_for('admin.dashboard') }}" class="text-on-surface-variant font-medium text-label-md hover:text-primary transition-colors">Admin Dashboard</a>
+<a href="{{ url_for('chatbot.help_page') }}" class="text-on-surface-variant font-medium text-label-md hover:text-primary transition-colors">Help & Support</a>
+</nav>
+<div class="flex items-center gap-md">
+<a href="{{ url_for('student.student_login') }}" class="px-lg py-2 rounded-full bg-primary text-white font-semibold text-label-md btn-hover-effect hidden md:block">Student Login</a>
+<a href="{{ url_for('admin.admin_login') }}" class="px-lg py-2 rounded-full border border-outline text-primary font-semibold text-label-md hover:bg-primary/5 transition-all hidden md:block">Staff Login</a>
+<button class="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-surface-container-low" id="mobile-menu-trigger">
+<span class="material-symbols-outlined text-on-surface-variant">menu</span>
+</button>
+</div>
+</div>
+</header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="hero-card">
-                <div class="hero-header">
-                    <div class="logo-container">
-                        <img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Cavendish University Logo" class="hero-logo logo-fix">
-                    </div>
-                    <h1 class="hero-title">Registration Portal</h1>
-                    <p class="hero-subtitle">Your Gateway to Academic Excellence</p>
-                </div>
+<main class="pt-[72px]">
+<!-- Hero Section -->
+<section class="relative hero-mesh animate-drift text-white py-32 px-gutter overflow-hidden">
+<div class="absolute inset-0 bg-black/20 z-0"></div>
+<div class="relative z-10 max-w-4xl mx-auto flex flex-col items-center text-center">
+<div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 mb-8">
+<span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+<span class="text-[11px] font-bold uppercase tracking-[0.2em]">Enrollment Cycle 2024 Open</span>
+</div>
+<h2 class="text-5xl md:text-7xl mb-6 tracking-tight leading-[1.1] font-bold">The Gateway to <br/><span class="text-blue-300">Academic Excellence</span></h2>
+<p class="text-lg md:text-xl text-blue-100/80 max-w-2xl leading-relaxed">Securely manage your academic journey, financial records, and institutional resources through our centralized portal.</p>
+</div>
+</section>
 
-                <div class="content-section">
-                    <div class="welcome-text">
-                        <h2>Welcome to Our Digital Campus</h2>
-                        <p>Access your academic journey through our secure online portal. Choose your role to continue to the dedicated platform.</p>
-                    </div>
+<!-- Portal Entry Cards -->
+<section class="max-w-container-max mx-auto px-gutter -mt-20 mb-32 relative z-20">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Student Portal Card -->
+<div class="glass-card rounded-2xl p-10 premium-shadow portal-card">
+<div class="flex justify-between items-start mb-10">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-3xl">person_search</span>
+</div>
+<span class="bg-primary/5 text-primary border border-primary/10 px-4 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">Student Entry</span>
+</div>
+<h3 class="text-3xl font-bold mb-4 text-primary">Student Portal</h3>
+<p class="text-on-surface-variant leading-relaxed mb-8 text-lg">Access transcripts, check grades, and manage course registrations through your personalized dashboard.</p>
+<div class="space-y-4 mb-10">
+<div class="flex items-center gap-3 text-sm font-semibold text-on-surface/70">
+<span class="material-symbols-outlined text-secondary">account_balance_wallet</span>
+Payment & Financial Tracking
+</div>
+<div class="flex items-center gap-3 text-sm font-semibold text-on-surface/70">
+<span class="material-symbols-outlined text-secondary">history_edu</span>
+Course History & Planning
+</div>
+</div>
+<a href="{{ url_for('student.student_login') }}" class="w-full py-4 rounded-xl bg-primary text-white font-bold text-label-md flex items-center justify-center gap-2 btn-hover-effect">
+Access My Account
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</a>
+</div>
 
-                    <div class="portal-cards">
-                        <!-- Student Portal Card -->
-                        <div class="portal-card">
-                            <div class="card-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-                                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
-                                </svg>
-                            </div>
-                            <h3>Student Portal</h3>
-                            <p>Access your academic records, upload payment documents, check registration status, and manage your student profile.</p>
-                            <a href="{{ url_for('student.student_login') }}" class="btn-portal btn-student">
-                                <span>Enter Student Portal</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-                                </svg>
-                            </a>
-                        </div>
+<!-- Admin Dashboard Card -->
+<div class="glass-card rounded-2xl p-10 premium-shadow portal-card">
+<div class="flex justify-between items-start mb-10">
+<div class="w-16 h-16 bg-white border-2 border-primary/10 rounded-2xl flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-primary text-3xl">shield_person</span>
+</div>
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">Restricted Access</span>
+</div>
+<h3 class="text-3xl font-bold mb-4 text-primary">Admin Dashboard</h3>
+<p class="text-on-surface-variant leading-relaxed mb-8 text-lg">Comprehensive suite for staff to oversee registrations, verify payments, and manage institutional data.</p>
+<div class="flex flex-wrap gap-3 mb-10">
+<span class="px-3 py-1 bg-surface-container rounded-lg text-xs font-semibold">Analytics</span>
+<span class="px-3 py-1 bg-surface-container rounded-lg text-xs font-semibold">Verification</span>
+<span class="px-3 py-1 bg-surface-container rounded-lg text-xs font-semibold">Reporting</span>
+</div>
+<a href="{{ url_for('admin.admin_login') }}" class="w-full py-4 rounded-xl border-2 border-primary text-primary font-bold text-label-md hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
+Staff Login
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
 
-                        <!-- Admin Portal Card -->
-                        <div class="portal-card admin">
-                            <div class="card-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-shield-lock" viewBox="0 0 16 16">
-                                    <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
-                                    <path d="M9.5 6.5a1.5 1.5 0 0 1-1 1.415l.385 1.99a.5.5 0 0 1-.491.595h-.788a.5.5 0 0 1-.49-.595l.384-1.99a1.5 1.5 0 1 1 2-1.415z"/>
-                                </svg>
-                            </div>
-                            <h3>Admin Dashboard</h3>
-                            <p>Manage student registrations, verify payments, oversee system operations, and access administrative functions.</p>
-                            <a href="{{ url_for('admin.admin_login') }}" class="btn-portal btn-admin">
-                                <span>Admin Login</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shield-check" viewBox="0 0 16 16">
-                                    <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
-                                    <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
+<!-- Institutional Values Section -->
+<section class="max-w-container-max mx-auto px-gutter mb-32">
+<div class="rounded-3xl overflow-hidden relative group h-[400px]">
+<img alt="University Campus" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJ4YNMDFMqBs4E-qX7VzkQrhSBf3PyEwd7pLjjvnvIqd55iC0zOjY2Xy8QTvypCUvCemtX9ypX3MA4iOH94G5w_xdCWexMvMbwgSOgR1mLKKr95Kii0sjBuUskfuzKysOhbEVUHl5l9y1YbCf7unyO3QgiDWvxjmpu675oGUjQuxZeMJiFPyVNz7FZydt01324oklUVsJwV7cWLjXAqPwSP8khOJnODilMb6ZN3p_BlVguURV5dNAfkRfY4oNgboOiw-YpP8QmIxBo"/>
+<div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/60 to-transparent flex items-center p-16">
+<div class="max-w-md text-white">
+<span class="text-[11px] font-bold tracking-[0.3em] uppercase opacity-70 mb-4 block">Institutional Heritage</span>
+<h4 class="text-4xl font-bold mb-4 leading-tight">Empowering the <br/>Next Generation</h4>
+<p class="text-blue-100 text-lg opacity-90 leading-relaxed mb-8">Building a legacy of academic excellence and global impact through innovative learning.</p>
+<a class="inline-flex items-center gap-2 text-white font-bold border-b-2 border-white/30 pb-1 hover:border-white transition-all" href="#">Learn our history</a>
+</div>
+</div>
+</div>
+</section>
 
-                    <!-- Features Section -->
-                    <div class="features-section">
-                        <div class="features-grid">
-                            <div class="feature-item">
-                                <div class="feature-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-credit-card" viewBox="0 0 16 16">
-                                        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z"/>
-                                        <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z"/>
-                                    </svg>
-                                </div>
-                                <h4>Secure Payments</h4>
-                                <p>Upload and track payment documents securely</p>
-                            </div>
-                            <div class="feature-item">
-                                <div class="feature-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
-                                        <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-                                    </svg>
-                                </div>
-                                <h4>24/7 Access</h4>
-                                <p>Round-the-clock access to your academic portal</p>
-                            </div>
-                            <div class="feature-item">
-                                <div class="feature-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-shield-check" viewBox="0 0 16 16">
-                                        <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
-                                        <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
-                                    </svg>
-                                </div>
-                                <h4>Data Security</h4>
-                                <p>Enterprise-grade security for all your data</p>
-                            </div>
-                            <div class="feature-item">
-                                <div class="feature-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-headset" viewBox="0 0 16 16">
-                                        <path d="M8 1a5 5 0 0 0-5 5v1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a6 6 0 1 1 12 0v6a2.5 2.5 0 0 1-2.5 2.5H9.366a1 1 0 0 1-.866.5h-1a1 1 0 1 1 0-2h1a1 1 0 0 1 .866.5H11.5A1.5 1.5 0 0 0 13 12h-1a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1V6a5 5 0 0 0-5-5z"/>
-                                    </svg>
-                                </div>
-                                <h4>Support</h4>
-                                <p>Dedicated support for all your queries</p>
-                            </div>
-                        </div>
-                    </div>
+<!-- Portal Capabilities -->
+<section class="bg-white py-32 px-gutter border-t border-outline-variant/20">
+<div class="max-w-container-max mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-20">
+<div class="max-w-xl">
+<h2 class="text-4xl font-bold text-primary mb-4 tracking-tight">Portal Capabilities</h2>
+<p class="text-xl text-on-surface-variant leading-relaxed">Advanced institutional technology designed to streamline every aspect of your university life.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+<div class="group p-8 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 hover:border-primary/20 transition-all hover:shadow-xl hover:shadow-primary/5">
+<span class="material-symbols-outlined text-primary text-3xl mb-6 block">verified_user</span>
+<h4 class="text-xl font-bold text-primary mb-3">Secure Payments</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Bank-grade encryption for all financial transactions and tuition processing.</p>
+</div>
+<div class="group p-8 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 hover:border-primary/20 transition-all hover:shadow-xl hover:shadow-primary/5">
+<span class="material-symbols-outlined text-primary text-3xl mb-6 block">update</span>
+<h4 class="text-xl font-bold text-primary mb-3">Live Updates</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Real-time notifications for grade postings, registration status, and campus news.</p>
+</div>
+<div class="group p-8 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 hover:border-primary/20 transition-all hover:shadow-xl hover:shadow-primary/5">
+<span class="material-symbols-outlined text-primary text-3xl mb-6 block">fingerprint</span>
+<h4 class="text-xl font-bold text-primary mb-3">Data Privacy</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Your personal and academic information is protected by industry-leading protocols.</p>
+</div>
+<div class="group p-8 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 hover:border-primary/20 transition-all hover:shadow-xl hover:shadow-primary/5">
+<span class="material-symbols-outlined text-primary text-3xl mb-6 block">headset_mic</span>
+<h4 class="text-xl font-bold text-primary mb-3">Concierge Support</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">24/7 dedicated assistance for all your technical and administrative inquiries.</p>
+</div>
+</div>
+</div>
+</section>
 
-                    <div class="footer">
-                        <img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Cavendish University Logo" class="footer-logo">
-                        <p>&copy; 2025 Cavendish University. All rights reserved. | Secure Academic Portal</p>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
+<!-- Mobile Drawer -->
+<aside class="hidden fixed inset-0 z-[100] bg-primary/20 backdrop-blur-sm" id="mobile-drawer">
+<div class="h-full w-4/5 max-w-sm bg-white shadow-2xl p-8 flex flex-col">
+<div class="flex justify-between items-center mb-12">
+<div class="flex items-center gap-2">
+<div class="logo-container">
+<img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Logo" class="h-8 w-auto">
+</div>
+<span class="font-bold text-primary">Cavendish</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container" id="close-drawer">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<nav class="flex flex-col gap-6">
+<a href="{{ url_for('student.student_dashboard') }}" class="text-xl font-bold text-primary border-b border-outline-variant/30 pb-4">Student Dashboard</a>
+<a href="{{ url_for('admin.dashboard') }}" class="text-xl font-bold text-on-surface-variant border-b border-outline-variant/30 pb-4">Admin Dashboard</a>
+<a href="{{ url_for('chatbot.help_page') }}" class="text-xl font-bold text-on-surface-variant border-b border-outline-variant/30 pb-4">Help & Support</a>
+</nav>
+<div class="mt-auto">
+<a href="{{ url_for('student.student_login') }}" class="w-full py-4 rounded-xl bg-primary text-white font-bold text-center block">Student Login</a>
+</div>
+</div>
+</aside>
+</main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Footer -->
+<footer class="bg-primary text-white pt-20 pb-10 px-gutter">
+<div class="max-w-container-max mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
+<div class="col-span-1 md:col-span-1">
+<div class="flex items-center gap-2 mb-6">
+<div class="logo-container bg-white/10">
+<img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Cavendish University Logo" class="footer-logo">
+</div>
+<h5 class="text-xl font-bold">Cavendish <br/><span class="text-[10px] tracking-[0.4em] uppercase text-blue-300">University</span></h5>
+</div>
+<p class="text-blue-100/60 text-sm leading-relaxed mb-8">Dedicated to fostering a culture of innovation, integrity, and lifelong learning for our global community.</p>
+</div>
+<div>
+<h6 class="font-bold text-sm uppercase tracking-widest text-blue-300 mb-6">Quick Links</h6>
+<ul class="space-y-4 text-blue-100/70 text-sm font-medium">
+<li><a class="hover:text-white transition-colors" href="#">Academic Calendar</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Student Handbook</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Financial Aid</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Career Services</a></li>
+</ul>
+</div>
+<div>
+<h6 class="font-bold text-sm uppercase tracking-widest text-blue-300 mb-6">Campus Info</h6>
+<ul class="space-y-4 text-blue-100/70 text-sm font-medium">
+<li><a class="hover:text-white transition-colors" href="#">Campus Map</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Safety & Security</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Events Portal</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Housing</a></li>
+</ul>
+</div>
+<div>
+<h6 class="font-bold text-sm uppercase tracking-widest text-blue-300 mb-6">Contact</h6>
+<ul class="space-y-4 text-blue-100/70 text-sm font-medium">
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-blue-300">mail</span>
+registrar@cavendish.edu
+</li>
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-blue-300">call</span>
++1 (555) 012-3456
+</li>
+</ul>
+</div>
+</div>
+<div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-xs text-blue-100/40">© 2024 Cavendish University. All rights reserved.</p>
+<div class="flex gap-8 text-xs text-blue-100/40">
+<a class="hover:text-blue-200" href="#">Privacy Policy</a>
+<a class="hover:text-blue-200" href="#">Terms of Service</a>
+<a class="hover:text-blue-200" href="#">Accessibility</a>
+</div>
+</div>
+</div>
+</footer>
+
+<script>
+    const menuBtn = document.getElementById('mobile-menu-trigger');
+    const drawer = document.getElementById('mobile-drawer');
+    const closeBtn = document.getElementById('close-drawer');
+
+    if (menuBtn) {
+        menuBtn.addEventListener('click', () => {
+            drawer.classList.remove('hidden');
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            drawer.classList.add('hidden');
+        });
+    }
+
+    drawer?.addEventListener('click', (e) => {
+        if (e.target === drawer) {
+            drawer.classList.add('hidden');
+        }
+    });
+
+    // Scroll reveal effect for hero elements
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const heroContent = document.querySelector('.hero-mesh > div.relative');
+        if (heroContent) {
+            heroContent.style.transform = `translateY(${scrolled * 0.1}px)`;
+            heroContent.style.opacity = 1 - (scrolled / 500);
+        }
+    });
+</script>
 </body>
 </html>

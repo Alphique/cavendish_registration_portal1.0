@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Create Program - Cavendish University Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}" class="text-decoration-none"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.view_programs') }}" class="text-decoration-none"><i class="fas fa-list me-1"></i>Programs</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Create Program</li>
+        </ol>
+    </nav>
+
+    <!-- Main Card -->
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-primary text-white py-3" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <i class="fas fa-plus-circle me-2 fa-lg"></i>
+                    <strong class="fs-4">Create New Academic Program</strong>
+                </div>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-light btn-sm rounded-pill px-3">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body p-4">
+            <!-- ========================= -->
+            <!-- CREATE PROGRAM FORM -->
+            <!-- ========================= -->
+            <form method="POST" id="createProgramForm">
+                <div class="row g-4">
+                    <!-- Left Column -->
+                    <div class="col-lg-7">
+                        <div class="card border-0 bg-light rounded-4 p-3">
+                            <h6 class="text-primary mb-3"><i class="fas fa-info-circle me-2"></i>Program Details</h6>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-book-open me-1 text-primary"></i>Program Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="name" class="form-control form-control-lg rounded-3" 
+                                       placeholder="e.g., Bachelor of Science in Computer Science" required>
+                                <div class="form-text text-muted">Full official name of the academic program</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-tag me-1 text-primary"></i>Short Name / Abbreviation
+                                </label>
+                                <input type="text" name="short_name" class="form-control rounded-3" 
+                                       placeholder="e.g., BSc CS, BBA, LLB">
+                                <div class="form-text text-muted">Optional abbreviation for quick reference</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-hourglass-half me-1 text-primary"></i>Duration <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="duration_years" class="form-select rounded-3" required>
+                                        <option value="3">3 Years</option>
+                                        <option value="4" selected>4 Years (Standard)</option>
+                                        <option value="5">5 Years</option>
+                                        <option value="6">6 Years</option>
+                                        <option value="7">7 Years (Medicine / Specialized)</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-star me-1 text-primary"></i>Total Credits
+                                    </label>
+                                    <input type="number" name="total_credits" class="form-control rounded-3" 
+                                           placeholder="e.g., 120, 160, 240">
+                                    <div class="form-text text-muted">Total credit hours required for graduation</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-building me-1 text-primary"></i>Faculty / College
+                                </label>
+                                <select name="faculty_id" class="form-select rounded-3">
+                                    <option value="">-- Select Faculty --</option>
+                                    {% for faculty in faculties %}
+                                        <option value="{{ faculty.id }}">{{ faculty.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text text-muted">Associate program with a faculty or college</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Information Panel -->
+                    <div class="col-lg-5">
+                        <div class="card border-0 bg-gradient-info rounded-4 p-3" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);">
+                            <h6 class="text-info mb-3"><i class="fas fa-info-circle me-2"></i>Program Structure Information</h6>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-success rounded-pill px-3 py-2">SEMESTER 1</span>
+                                    <span class="badge bg-success rounded-pill px-3 py-2">SEMESTER 2</span>
+                                </div>
+                                <p class="small text-muted mb-0">✓ Both semesters are <strong>mandatory</strong> for every academic year</p>
+                            </div>
+
+                            <hr class="my-2">
+
+                            <div class="mt-2">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-warning rounded-pill px-3 py-2">SUMMER</span>
+                                    <span class="badge bg-secondary rounded-pill px-3 py-2">INDUSTRIAL</span>
+                                </div>
+                                <p class="small text-muted mb-0">✓ Summer and Industrial Attachment can be <strong>enabled later</strong> via program settings</p>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <div class="alert alert-info border-0 small mb-0">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Pro Tip:</strong> After creating the program, you'll be redirected to the Program Builder where you can add courses and define semester structures.
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats Preview -->
+                        <div class="card border-0 bg-light rounded-4 p-3 mt-3">
+                            <h6 class="text-secondary mb-3"><i class="fas fa-chart-line me-2"></i>Program Preview</h6>
+                            <div id="programPreview" class="small">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Program Name:</span>
+                                    <span class="fw-semibold" id="previewName">—</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Duration:</span>
+                                    <span class="fw-semibold" id="previewDuration">4 Years</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Total Semesters:</span>
+                                    <span class="fw-semibold" id="previewSemesters">8</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Faculty:</span>
+                                    <span class="fw-semibold" id="previewFaculty">—</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Form Actions -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 py-2" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: none;">
+                        <i class="fas fa-check-circle me-2"></i>Create Program
+                        <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recent Programs Quick View -->
+    <div class="card border-0 shadow-sm rounded-4 mt-4">
+        <div class="card-header bg-white border-0 pt-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="fas fa-history me-2 text-primary"></i>Recently Created Programs</h6>
+                <a href="{{ url_for('admin.view_programs') }}" class="text-decoration-none small">View All <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Program Name</th>
+                            <th>Duration</th>
+                            <th>Faculty</th>
+                            <th>Created</th>
+                        </thead>
+                        <tbody id="recentProgramsPreview">
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">
+                                    <i class="fas fa-spinner fa-spin me-2"></i>Loading recent programs...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        .bg-gradient-info {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #2a5298;
+            box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.15);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #172b4d 0%, #1e3c72 100%) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+        .breadcrumb a {
+            color: #1e3c72;
+            transition: color 0.2s;
+        }
+        .breadcrumb a:hover {
+            color: #2a5298;
+            text-decoration: underline !important;
+        }
+    </style>
+
+    <script>
+        // Live preview update
+        document.querySelectorAll('input[name="name"], input[name="short_name"], select[name="duration_years"], select[name="faculty_id"]').forEach(element => {
+            element.addEventListener('input', updatePreview);
+            element.addEventListener('change', updatePreview);
+        });
+
+        function updatePreview() {
+            // Update program name preview
+            const programName = document.querySelector('input[name="name"]').value;
+            document.getElementById('previewName').innerText = programName || '—';
+            
+            // Update duration preview
+            const duration = document.querySelector('select[name="duration_years"]').value;
+            document.getElementById('previewDuration').innerText = duration + ' Year' + (duration != 1 ? 's' : '');
+            document.getElementById('previewSemesters').innerText = (parseInt(duration) * 2) + ' Semesters';
+            
+            // Update faculty preview
+            const facultySelect = document.querySelector('select[name="faculty_id"]');
+            const selectedFaculty = facultySelect.options[facultySelect.selectedIndex]?.text;
+            document.getElementById('previewFaculty').innerText = selectedFaculty || '—';
+        }
+
+        // Load recent programs (optional AJAX)
+        fetch('/admin/recent-programs')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('recentProgramsPreview');
+                if (data.programs && data.programs.length > 0) {
+                    tbody.innerHTML = data.programs.map(p => `
+                        <tr>
+                            <td class="fw-semibold">${escapeHtml(p.name)}</td>
+                            <td>${p.duration_years} years</td>
+                            <td>${p.faculty_name || '—'}</td>
+                            <td class="text-muted small">${p.created_at || 'Recently'}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3"><i class="fas fa-inbox me-2"></i>No programs created yet</td></tr>';
+                }
+            })
+            .catch(() => {
+                document.getElementById('recentProgramsPreview').innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3"><i class="fas fa-database me-2"></i>Unable to load recent programs</td></tr>';
+            });
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</div>
+{% endblock %}

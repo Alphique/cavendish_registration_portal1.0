@@ -115,11 +115,87 @@ MAIN CONTENT CONTAINER
                     <p><strong>Phone:</strong> {{ student.phone or 'Not provided' }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong>Program:</strong> {{ student.program or 'Not specified' }}</p>
-                    <p><strong>Faculty:</strong> {{ student.faculty or 'Not specified' }}</p>
-                    <p><strong>Intake Year:</strong> {{ student.intake_year or 'Not specified' }}</p>
-                    <p><strong>Year of Study:</strong> {{ student.year_of_study or 'Not specified' }}</p>
-                    <p><strong>Semester:</strong> {{ student.semester or 'Not specified' }}</p>
+                    <p>
+    <strong>Program:</strong>
+    {{ program.name if program else 'Not Assigned' }}
+</p>
+
+<p>
+    <strong>Faculty:</strong>
+    {{ faculty.name if faculty else 'Not Assigned' }}
+</p>
+
+<p>
+    <strong>Year Level:</strong>
+    {{ registration.year_level if registration else 'N/A' }}
+</p>
+
+<p>
+    <strong>Semester:</strong>
+    {{ registration.semester_type if registration else 'N/A' }}
+</p>
+
+<p>
+    <strong>Academic Year:</strong>
+    {{ academic_year.name if academic_year else 'N/A' }}
+</p>
+
+<p>
+    <strong>Registration Status:</strong>
+
+    {% if registration %}
+        <span class="badge bg-success">
+            {{ registration.payment_status }}
+        </span>
+    {% else %}
+        <span class="badge bg-secondary">
+            Not Registered
+        </span>
+    {% endif %}
+    </p>
+
+    <!-- Additional student details can be added here -->
+    <div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">
+            Registered Courses
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        {% if registered_courses %}
+
+        <table class="table table-bordered">
+
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Course Title</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for rc in registered_courses %}
+                <tr>
+                    <td>{{ rc.course.code }}</td>
+                    <td>{{ rc.course.title }}</td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+            <p>No registered courses found.</p>
+
+        {% endif %}
+
+    </div>
+</div>
                 </div>
             </div>
         </div>

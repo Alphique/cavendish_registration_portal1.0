@@ -9,6 +9,18 @@ from werkzeug.security import check_password_hash
 from datetime import datetime
 from app.models import db, User, Student, Payment, Registration, RegistrationSlip
 
+# IMPORTANT: Add this import - this was causing NameError
+from app.models_academics import (
+    Faculty,
+    Program,
+    Course,
+    ProgramCourse,
+    ProgramStructure,
+    AcademicYear,
+    StudentRegistration,      # ADDED - fixes NameError
+    RegisteredCourse          # ADDED - for future use
+)
+
 admin_bp = Blueprint('admin', __name__, template_folder='../templates/admin')
 
 # -----------------
@@ -75,33 +87,70 @@ def dashboard():
     )
 
 # -----------------
-# Payment Management
+# Payment Management (FIXED - with StudentRegistration sync)
 # -----------------
 @admin_bp.route('/payment/<int:payment_id>/<action>')
 @admin_required
 def manage_payment(payment_id, action):
-    """Approve or reject payments with auto-registration slip creation"""
+    """Approve or reject payments with full registration sync"""
+
     payment = Payment.query.get_or_404(payment_id)
 
+    # =========================
+    # APPROVE PAYMENT
+    # =========================
     if action == 'approve':
         payment.status = 'approved'
         payment.approved_date = datetime.utcnow()
-        
-        # Create registration record
-        registration = Registration.query.filter_by(student_id=payment.student_id).first()
+
+        student_id = payment.student_id
+
+        # -------------------------------------------------
+        # 1. FIND EXISTING REGISTRATION FOR THIS STUDENT
+        #    IMPORTANT: Look for pending registration first
+        # -------------------------------------------------
+        registration = StudentRegistration.query.filter_by(
+            student_id=student_id,
+            payment_status='pending'
+        ).order_by(StudentRegistration.id.desc()).first()
+
+        # If no pending registration, check for any registration
         if not registration:
-            registration = Registration(student_id=payment.student_id, is_registered=True)
-            db.session.add(registration)
+            registration = StudentRegistration.query.filter_by(
+                student_id=student_id
+            ).order_by(StudentRegistration.id.desc()).first()
+
+        if registration:
+            # UPDATE EXISTING REGISTRATION TO APPROVED
+            registration.payment_status = 'approved'
+            flash(f'Registration payment_status updated to approved for student ID {student_id}', 'info')
         else:
-            registration.is_registered = True
-        
-        # AUTO-CREATE REGISTRATION SLIP
-        existing_slip = RegistrationSlip.query.filter_by(student_id=payment.student_id).first()
+            # CREATE NEW REGISTRATION IF NONE EXISTS
+            flash("No registration application found. Creating one automatically.", "warning")
+
+            registration = StudentRegistration(
+                student_id=student_id,
+                program_id=payment.student.program_id if hasattr(payment.student, "program_id") else None,
+                year_level=payment.student.year_of_study if hasattr(payment.student, "year_of_study") else None,
+                semester_type="SEM1",
+                payment_status="approved"
+            )
+            db.session.add(registration)
+            db.session.flush()
+
+        # -------------------------------------------------
+        # 2. GENERATE REGISTRATION SLIP (ONLY ONCE)
+        # -------------------------------------------------
+        existing_slip = RegistrationSlip.query.filter_by(
+            student_id=student_id
+        ).first()
+
         if not existing_slip:
-            slip_number = f"RS{payment.student_id:06d}-{datetime.now().strftime('%Y%m%d')}"
+            slip_number = f"RS{student_id:06d}-{datetime.now().strftime('%Y%m%d')}"
+
             registration_slip = RegistrationSlip(
                 slip_number=slip_number,
-                student_id=payment.student_id,
+                student_id=student_id,
                 program_name=payment.student.program or "To be assigned",
                 faculty_name=payment.student.faculty or "To be assigned",
                 academic_year="2024/2025",
@@ -109,30 +158,50 @@ def manage_payment(payment_id, action):
                 issue_date=datetime.utcnow(),
                 created_by=session.get('user_id', 'admin')
             )
+
             db.session.add(registration_slip)
-            db.session.commit()
-            
+            db.session.flush()
+
             # Generate PDF
             from app.utils.helpers import generate_registration_slip_pdf
-            if generate_registration_slip_pdf(registration_slip):
-                db.session.commit()
-                flash(f'Payment approved and registration slip created for {payment.student.name}!', 'success')
-            else:
-                flash(f'Payment approved but PDF generation failed for {payment.student.name}.', 'warning')
-        else:
-            # Slip already exists, just approve payment
-            db.session.commit()
-            flash(f'Payment for {payment.student.name} approved.', 'success')
+            success = generate_registration_slip_pdf(registration_slip)
 
+            if success:
+                flash(f'Payment approved & registration completed for {payment.student.name}', 'success')
+            else:
+                flash(f'Payment approved but slip PDF generation failed for {payment.student.name}', 'warning')
+        else:
+            flash(f'Payment approved for {payment.student.name}', 'success')
+
+        db.session.commit()
+
+    # =========================
+    # REJECT PAYMENT
+    # =========================
     elif action == 'reject':
         payment.status = 'rejected'
+        payment.approved_date = datetime.utcnow()
+
+        # Optionally update registration status if exists
+        registration = StudentRegistration.query.filter_by(
+            student_id=payment.student_id,
+            payment_status='pending'
+        ).order_by(StudentRegistration.id.desc()).first()
+
+        if registration:
+            registration.payment_status = 'rejected'
+
         db.session.commit()
         flash(f'Payment for {payment.student.name} rejected.', 'warning')
+
     else:
         flash("Invalid action.", "danger")
 
     return redirect(url_for('admin.dashboard'))
 
+# -----------------
+# Payment Preview
+# -----------------
 @admin_bp.route('/payment/<int:payment_id>/preview')
 @admin_required
 def preview_payment(payment_id):
@@ -213,8 +282,20 @@ def view_registration_slips():
 @admin_bp.route('/edit_registration_slip/<int:slip_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_registration_slip(slip_id):
-    """Edit an existing registration slip"""
+    """Edit an existing registration slip with live academic data"""
     slip = RegistrationSlip.query.get_or_404(slip_id)
+    
+    # Get live academic registration data
+    academic_registration = StudentRegistration.query.filter_by(
+        student_id=slip.student_id
+    ).order_by(StudentRegistration.id.desc()).first()
+    
+    # Get registered courses
+    registered_courses = []
+    if academic_registration:
+        registered_courses = RegisteredCourse.query.filter_by(
+            registration_id=academic_registration.id
+        ).all()
     
     if request.method == 'POST':
         try:
@@ -238,8 +319,14 @@ def edit_registration_slip(slip_id):
             db.session.rollback()
             flash(f'Error updating registration slip: {str(e)}', 'danger')
     
-    return render_template('admin/edit_registration_slip.html', slip=slip)
-
+    return render_template(
+        'admin/edit_registration_slip.html', 
+        slip=slip,
+        academic_registration=academic_registration,
+        registered_courses=registered_courses
+    )
+    
+    
 @admin_bp.route('/regenerate_slip_pdf/<int:slip_id>')
 @admin_required
 def regenerate_slip_pdf(slip_id):
@@ -301,21 +388,71 @@ def view_students():
     students = Student.query.all()
     return render_template('admin/students.html', students=students)
 
+# -----------------
+# View Student Details (with registration & payment history)
 @admin_bp.route('/student/<int:student_id>')
 @admin_required
 def view_student_details(student_id):
-    """View student details and history."""
+
     student = Student.query.get_or_404(student_id)
-    payments = Payment.query.filter_by(student_id=student_id).order_by(Payment.submitted_date.desc()).all()
-    registration_slip = RegistrationSlip.query.filter_by(student_id=student_id).first()
-    
+
+    payments = Payment.query.filter_by(
+        student_id=student_id
+    ).order_by(
+        Payment.submitted_date.desc()
+    ).all()
+
+    registration_slip = RegistrationSlip.query.filter_by(
+        student_id=student_id
+    ).first()
+
+    registration = StudentRegistration.query.filter_by(
+        student_id=student_id
+    ).order_by(
+        StudentRegistration.id.desc()
+    ).first()
+
+    program = None
+    faculty = None
+    academic_year = None
+    registered_courses = []
+
+    if registration:
+
+        program = Program.query.get(
+            registration.program_id
+        )
+
+        if registration.academic_year_id:
+            academic_year = AcademicYear.query.get(
+                registration.academic_year_id
+            )
+
+        if program and program.faculty_id:
+            faculty = Faculty.query.get(
+                program.faculty_id
+            )
+
+        registered_courses = (
+            RegisteredCourse.query
+            .filter_by(
+                registration_id=registration.id
+            )
+            .all()
+        )
+
     return render_template(
         'admin/student_details.html',
         student=student,
         payments=payments,
-        registration_slip=registration_slip
+        registration_slip=registration_slip,
+        registration=registration,
+        program=program,
+        faculty=faculty,
+        academic_year=academic_year,
+        registered_courses=registered_courses
     )
-
+    
 # -----------------
 # Admin Management
 # -----------------
@@ -428,3 +565,381 @@ def serve_uploaded_file(filename):
         path=filename,
         as_attachment=False
     )
+    
+# -----------------
+# Academic Management (Faculties, Programs, Courses)
+# -----------------
+
+@admin_bp.route('/program/create', methods=['GET', 'POST'])
+@admin_required
+def create_program():
+    faculties = Faculty.query.all()
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        short_name = request.form.get('short_name')
+        duration_years = int(request.form.get('duration_years') or 0)
+        total_credits = request.form.get('total_credits')
+        faculty_id = request.form.get('faculty_id')
+
+        # ---------------- VALIDATION ----------------
+        if not name or duration_years <= 0:
+            flash("Program name and valid duration are required.", "danger")
+            return redirect(url_for('admin.create_program'))
+
+        existing = Program.query.filter_by(name=name).first()
+        if existing:
+            flash("Program already exists.", "warning")
+            return redirect(url_for('admin.create_program'))
+
+        # ---------------- CREATE PROGRAM ----------------
+        program = Program(
+            name=name,
+            short_name=short_name,
+            duration_years=duration_years,
+            total_credits=int(total_credits) if total_credits else None,
+            faculty_id=faculty_id
+        )
+
+        db.session.add(program)
+        db.session.flush()  # get program.id
+
+        # ---------------- AUTO BUILD STRUCTURE ----------------
+        semester_types = ["SEM1", "SEM2"]
+
+        for year_level in range(1, duration_years + 1):
+            for sem in semester_types:
+                structure = ProgramStructure(
+                    program_id=program.id,
+                    year_level=year_level,
+                    semester_type=sem,
+                    is_active=True,
+                    is_mandatory=True
+                )
+                db.session.add(structure)
+
+        db.session.commit()
+
+        flash("Program created successfully!", "success")
+        return redirect(url_for('admin.program_builder', program_id=program.id))
+
+    return render_template('admin/create_program.html', faculties=faculties)
+
+# -----------------
+# View Programs
+# -----------------
+@admin_bp.route('/programs')
+@admin_required
+def view_programs():
+    programs = Program.query.all()
+    return render_template('admin/view_program.html', programs=programs)
+
+# -----------------
+# Edit Program
+# -----------------
+@admin_bp.route('/program/edit/<int:program_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_program(program_id):
+    program = Program.query.get_or_404(program_id)
+    faculties = Faculty.query.all()
+
+    if request.method == 'POST':
+        new_duration = int(request.form.get('duration_years') or 0)
+
+        # ---------------- SAFETY CHECK ----------------
+        if new_duration < program.duration_years:
+            flash("You cannot reduce program duration (data integrity risk).", "danger")
+            return redirect(url_for('admin.edit_program', program_id=program.id))
+
+        program.name = request.form.get('name')
+        program.short_name = request.form.get('short_name')
+        program.total_credits = int(request.form.get('total_credits') or 0)
+        program.faculty_id = request.form.get('faculty_id')
+
+        # ONLY allow extension
+        if new_duration > program.duration_years:
+            for year in range(program.duration_years + 1, new_duration + 1):
+                new_structure = ProgramStructure(
+                    program_id=program.id,
+                    year=year,
+                    has_semester_1=True,
+                    has_semester_2=True,
+                    has_summer_semester=False,
+                    has_industrial_attachment=False,
+                    industrial_attachment_mandatory=False
+                )
+                db.session.add(new_structure)
+
+            program.duration_years = new_duration
+
+        db.session.commit()
+
+        flash("Program updated safely!", "success")
+        return redirect(url_for('admin.view_programs'))
+
+    return render_template('admin/create_program.html', program=program, faculties=faculties)
+
+
+# -----------------
+# Delete Program
+# -----------------
+@admin_bp.route('/program/delete/<int:program_id>')
+@admin_required
+def delete_program(program_id):
+    program = Program.query.get_or_404(program_id)
+
+    # HARD SAFETY CHECKS
+    if program.program_courses:
+        flash("Cannot delete program: courses assigned.", "danger")
+        return redirect(url_for('admin.view_programs'))
+
+    if hasattr(program, "students") and program.students:
+        flash("Cannot delete program: students enrolled.", "danger")
+        return redirect(url_for('admin.view_programs'))
+
+    if program.program_structures:
+        for s in program.program_structures:
+            db.session.delete(s)
+
+    db.session.delete(program)
+    db.session.commit()
+
+    flash("Program deleted successfully!", "success")
+    return redirect(url_for('admin.view_programs'))
+
+# ==========================================
+# PROGRAM BUILDER
+# ==========================================
+
+@admin_bp.route('/program/<int:program_id>/builder')
+@admin_required
+def program_builder(program_id):
+
+    program = Program.query.get_or_404(program_id)
+
+    curriculum = ProgramCourse.query.filter_by(
+        program_id=program.id
+    ).order_by(
+        ProgramCourse.year_level,
+        ProgramCourse.semester_type
+    ).all()
+
+    return render_template(
+        'admin/program_builder.html',
+        program=program,
+        curriculum=curriculum
+    )
+
+
+# ==========================================
+# ADD COURSE TO PROGRAM
+# ==========================================
+
+@admin_bp.route(
+    '/program/<int:program_id>/add-course',
+    methods=['POST']
+)
+@admin_required
+def add_course_to_program(program_id):
+
+    program = Program.query.get_or_404(program_id)
+
+    code = request.form.get('course_code', '').strip().upper()
+    title = request.form.get('course_title', '').strip()
+    credits = request.form.get('credits') or 0
+
+    year_level = int(request.form.get('year_level'))
+    semester_type = request.form.get('semester_type')
+
+    # -----------------------
+    # Validation
+    # -----------------------
+
+    if not code:
+        flash("Course code required.", "danger")
+        return redirect(
+            url_for(
+                'admin.program_builder',
+                program_id=program.id
+            )
+        )
+
+    if not title:
+        flash("Course title required.", "danger")
+        return redirect(
+            url_for(
+                'admin.program_builder',
+                program_id=program.id
+            )
+        )
+
+    # -----------------------
+    # Reuse Existing Course
+    # -----------------------
+
+    course = Course.query.filter_by(code=code).first()
+
+    if course:
+
+        # Ensure same code doesn't carry
+        # a different title
+
+        if course.title.lower() != title.lower():
+
+            flash(
+                f"Course code {code} already exists as "
+                f"'{course.title}'.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    'admin.program_builder',
+                    program_id=program.id
+                )
+            )
+
+    else:
+
+        course = Course(
+            code=code,
+            title=title,
+            credits=int(credits)
+        )
+
+        db.session.add(course)
+        db.session.flush()
+
+    # -----------------------
+    # Prevent duplicate assignment
+    # -----------------------
+
+    existing_assignment = ProgramCourse.query.filter_by(
+        program_id=program.id,
+        course_id=course.id,
+        year_level=year_level,
+        semester_type=semester_type
+    ).first()
+
+    if existing_assignment:
+
+        flash(
+            "Course already assigned to this semester.",
+            "warning"
+        )
+
+        return redirect(
+            url_for(
+                'admin.program_builder',
+                program_id=program.id
+            )
+        )
+
+    # -----------------------
+    # Assign Course
+    # -----------------------
+
+    assignment = ProgramCourse(
+        program_id=program.id,
+        course_id=course.id,
+        year_level=year_level,
+        semester_type=semester_type,
+        is_mandatory=True
+    )
+
+    db.session.add(assignment)
+    db.session.commit()
+
+    flash(
+        f"{code} added successfully.",
+        "success"
+    )
+
+    return redirect(
+        url_for(
+            'admin.program_builder',
+            program_id=program.id
+        )
+    )
+
+
+# ==========================================
+# REMOVE COURSE
+# ==========================================
+
+@admin_bp.route(
+    '/program-course/delete/<int:id>'
+)
+@admin_required
+def remove_program_course(id):
+
+    assignment = ProgramCourse.query.get_or_404(id)
+
+    program_id = assignment.program_id
+
+    db.session.delete(assignment)
+    db.session.commit()
+
+    flash(
+        "Course removed successfully.",
+        "success"
+    )
+
+    return redirect(
+        url_for(
+            'admin.program_builder',
+            program_id=program_id
+        )
+    )
+
+
+# ==========================================
+# ADMIN: VIEW ALL REGISTRATIONS
+# ==========================================
+@admin_bp.route('/registrations')
+@admin_required
+def view_registrations():
+    """View all student registrations"""
+    registrations = StudentRegistration.query.order_by(
+        StudentRegistration.registration_date.desc()
+    ).all()
+    
+    return render_template(
+        'admin/registrations.html',
+        registrations=registrations
+    )
+
+
+# ==========================================
+# ADMIN: UPDATE REGISTRATION STATUS MANUALLY
+# ==========================================
+@admin_bp.route('/registration/<int:reg_id>/update-status/<status>')
+@admin_required
+def update_registration_status(reg_id, status):
+    """Manually update registration payment status"""
+    registration = StudentRegistration.query.get_or_404(reg_id)
+    
+    if status in ['approved', 'pending', 'rejected']:
+        registration.payment_status = status
+        db.session.commit()
+        flash(f'Registration #{reg_id} status updated to {status}', 'success')
+    else:
+        flash('Invalid status', 'danger')
+    
+    return redirect(url_for('admin.view_registrations'))
+
+# ==========================================
+# ADMIN: DASHBOARD PREVIEW - RECENT PROGRAMS
+@admin_bp.route('/recent-programs')
+@admin_required
+def recent_programs():
+    """Get recent programs for dashboard preview"""
+    programs = Program.query.order_by(Program.id.desc()).limit(5).all()
+    return jsonify({
+        'programs': [{
+            'name': p.name,
+            'duration_years': p.duration_years,
+            'faculty_name': p.faculty.name if p.faculty else None,
+            'created_at': p.created_at.strftime('%Y-%m-%d') if p.created_at else None
+        } for p in programs]
+    })

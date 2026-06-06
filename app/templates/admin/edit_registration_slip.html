@@ -19,6 +19,22 @@
             padding: 20px;
             margin-bottom: 20px;
         }
+        .live-data-badge {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-left: 8px;
+        }
+        .info-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .data-source {
+            border-left: 3px solid #28a745;
+            background: #f0fff4;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -37,7 +53,7 @@
 
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <div class="card">
+                <div class="card shadow-sm">
                     <div class="card-header text-white">
                         <h4 class="mb-0">
                             <i class="fas fa-edit me-2"></i>Edit Registration Slip
@@ -87,11 +103,73 @@
                             </div>
                         </div>
 
-                        <!-- Edit Form -->
+                        <!-- Live Academic Registration Data -->
+                        {% if academic_registration %}
+                        <div class="alert alert-success data-source">
+                            <i class="fas fa-database me-2"></i>
+                            <strong>Live Data Found!</strong> The student has an active academic registration. The slip will use this data.
+                            <div class="mt-2 small">
+                                <i class="fas fa-calendar me-1"></i> Registration Date: {{ academic_registration.registration_date.strftime('%d/%m/%Y') if academic_registration.registration_date else 'N/A' }} |
+                                <i class="fas fa-credit-card me-1"></i> Payment Status: 
+                                <span class="badge bg-{{ 'success' if academic_registration.payment_status == 'approved' else 'warning' }}">
+                                    {{ academic_registration.payment_status|upper }}
+                                </span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>No Academic Registration Found!</strong> This student has not completed the registration process. Please ask them to register first.
+                        </div>
+                        {% endif %}
+
+                        <!-- Registered Courses (Read-only - from live data) -->
+                        {% if registered_courses %}
+                        <div class="card mb-4 border-success">
+                            <div class="card-header bg-success text-white">
+                                <i class="fas fa-book me-2"></i>Registered Courses (from Student Registration)
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Course Code</th>
+                                                <th>Course Title</th>
+                                                <th>Credits</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for rc in registered_courses %}
+                                            {% if rc.course %}
+                                            <tr>
+                                                <td>{{ rc.course.code or 'N/A' }}</td>
+                                                <td>{{ rc.course.title or 'N/A' }}</td>
+                                                <td>{{ rc.course.credits or 0 }}</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-secondary">
+                                                <td colspan="2" class="text-end fw-bold">Total Credits:</td>
+                                                <td class="fw-bold">{{ registered_courses|sum(attribute='course.credits') if registered_courses else 0 }}</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Edit Form - Pre-populated with live data if available -->
                         <form method="POST">
                             <div class="form-section">
                                 <h5 class="mb-3">
-                                    <i class="fas fa-edit me-2"></i>Editable Information
+                                    <i class="fas fa-edit me-2"></i>Registration Slip Details
+                                    <span class="live-data-badge">
+                                        <i class="fas fa-sync-alt me-1"></i>Syncs with registration
+                                    </span>
                                 </h5>
                                 
                                 <div class="row">
@@ -100,9 +178,16 @@
                                             <strong>Program Name</strong>
                                         </label>
                                         <input type="text" class="form-control" id="program_name" name="program_name" 
-                                               value="{{ slip.program_name or '' }}" 
+                                               value="{{ academic_registration.program.name if academic_registration and academic_registration.program else slip.program_name or '' }}" 
                                                placeholder="Enter program name" required>
-                                        <div class="form-text">The student's academic program</div>
+                                        <div class="form-text info-text">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            {% if academic_registration and academic_registration.program %}
+                                                <span class="text-success">Auto-filled from student's registration: {{ academic_registration.program.name }}</span>
+                                            {% else %}
+                                                Manual entry (no registration found)
+                                            {% endif %}
+                                        </div>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
@@ -110,9 +195,42 @@
                                             <strong>Faculty Name</strong>
                                         </label>
                                         <input type="text" class="form-control" id="faculty_name" name="faculty_name" 
-                                               value="{{ slip.faculty_name or '' }}" 
+                                               value="{{ academic_registration.program.faculty.name if academic_registration and academic_registration.program and academic_registration.program.faculty else slip.faculty_name or '' }}" 
                                                placeholder="Enter faculty name" required>
-                                        <div class="form-text">The faculty/department</div>
+                                        <div class="form-text info-text">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            {% if academic_registration and academic_registration.program and academic_registration.program.faculty %}
+                                                <span class="text-success">Auto-filled from program faculty: {{ academic_registration.program.faculty.name }}</span>
+                                            {% else %}
+                                                Manual entry (no faculty assigned)
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="year_level" class="form-label">
+                                            <strong>Year of Study</strong>
+                                        </label>
+                                        <input type="text" class="form-control" id="year_level" name="year_level" 
+                                               value="Year {{ academic_registration.year_level if academic_registration and academic_registration.year_level else 'N/A' }}" 
+                                               readonly disabled>
+                                        <div class="form-text info-text">
+                                            <i class="fas fa-lock me-1"></i> Locked - pulled from student's registration
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="semester_type" class="form-label">
+                                            <strong>Semester Type</strong>
+                                        </label>
+                                        <input type="text" class="form-control" id="semester_type" name="semester_type" 
+                                               value="{% if academic_registration and academic_registration.semester_type == 'SEM1' %}Semester 1{% elif academic_registration and academic_registration.semester_type == 'SEM2' %}Semester 2{% elif academic_registration and academic_registration.semester_type == 'SUMMER' %}Summer Semester{% elif academic_registration and academic_registration.semester_type == 'INDUSTRIAL' %}Industrial Attachment{% else %}N/A{% endif %}" 
+                                               readonly disabled>
+                                        <div class="form-text info-text">
+                                            <i class="fas fa-lock me-1"></i> Locked - pulled from student's registration
+                                        </div>
                                     </div>
                                 </div>
 
@@ -131,15 +249,15 @@
 
                                     <div class="col-md-6 mb-3">
                                         <label for="semester" class="form-label">
-                                            <strong>Semester</strong>
+                                            <strong>Semester Display Name</strong>
                                         </label>
                                         <select class="form-control" id="semester" name="semester" required>
                                             <option value="Semester 1" {% if slip.semester == 'Semester 1' or not slip.semester %}selected{% endif %}>Semester 1</option>
                                             <option value="Semester 2" {% if slip.semester == 'Semester 2' %}selected{% endif %}>Semester 2</option>
                                             <option value="Summer Semester" {% if slip.semester == 'Summer Semester' %}selected{% endif %}>Summer Semester</option>
-                                            <option value="Special Semester" {% if slip.semester == 'Special Semester' %}selected{% endif %}>Special Semester</option>
+                                            <option value="Industrial Attachment" {% if slip.semester == 'Industrial Attachment' %}selected{% endif %}>Industrial Attachment</option>
                                         </select>
-                                        <div class="form-text">Select the semester</div>
+                                        <div class="form-text">Display name for the semester on the slip</div>
                                     </div>
                                 </div>
                             </div>
@@ -201,43 +319,5 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Form validation
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const requiredFields = form.querySelectorAll('[required]');
-            
-            form.addEventListener('submit', function(e) {
-                let valid = true;
-                
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        valid = false;
-                        field.classList.add('is-invalid');
-                    } else {
-                        field.classList.remove('is-invalid');
-                    }
-                });
-                
-                if (!valid) {
-                    e.preventDefault();
-                    alert('Please fill in all required fields.');
-                }
-            });
-            
-            // Real-time validation
-            requiredFields.forEach(field => {
-                field.addEventListener('input', function() {
-                    if (this.value.trim()) {
-                        this.classList.remove('is-invalid');
-                        this.classList.add('is-valid');
-                    } else {
-                        this.classList.remove('is-valid');
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>

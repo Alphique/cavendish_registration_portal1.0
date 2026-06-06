@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+
+{% block title %}Programs Management - Cavendish University Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}" class="text-decoration-none"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Programs</li>
+        </ol>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="display-6 fw-bold text-primary mb-0">
+                <i class="fas fa-graduation-cap me-2"></i>Academic Programs
+            </h1>
+            <p class="text-muted mt-2 mb-0">
+                Manage all academic programs, curricula, and course structures
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+            <a href="{{ url_for('admin.create_program') }}" class="btn btn-primary rounded-pill px-4" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: none;">
+                <i class="fas fa-plus-circle me-2"></i>Create New Program
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex p-3 mb-2">
+                        <i class="fas fa-book fa-2x text-primary"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold">{{ programs|length }}</h3>
+                    <p class="text-muted mb-0">Total Programs</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex p-3 mb-2">
+                        <i class="fas fa-building fa-2x text-success"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold">{{ programs|map(attribute='faculty')|select('defined')|list|length }}</h3>
+                    <p class="text-muted mb-0">Faculties</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-info bg-opacity-10 d-inline-flex p-3 mb-2">
+                        <i class="fas fa-clock fa-2x text-info"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold">{{ programs|sum(attribute='duration_years') // programs|length if programs|length > 0 else 0 }}</h3>
+                    <p class="text-muted mb-0">Avg. Duration (Yrs)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex p-3 mb-2">
+                        <i class="fas fa-star fa-2x text-warning"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold">{{ programs|map(attribute='total_credits')|select('defined')|list|length }}</h3>
+                    <p class="text-muted mb-0">With Credit Data</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-3">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Search programs by name or code...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select id="facultyFilter" class="form-select">
+                        <option value="">All Faculties</option>
+                        {% for faculty in programs|map(attribute='faculty')|select('defined')|unique(attribute='id') %}
+                            <option value="{{ faculty.id }}">{{ faculty.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select id="durationFilter" class="form-select">
+                        <option value="">All Durations</option>
+                        <option value="3">3 Years</option>
+                        <option value="4">4 Years</option>
+                        <option value="5">5 Years</option>
+                        <option value="6">6 Years</option>
+                        <option value="7">7+ Years</option>
+                    </select>
+                </div>
+                <div class="col-md-2 text-end">
+                    <button class="btn btn-outline-secondary btn-sm" id="resetFilters">
+                        <i class="fas fa-undo-alt me-1"></i>Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Programs Table -->
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-white py-3 border-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-semibold text-primary">
+                    <i class="fas fa-list me-2"></i>All Programs
+                </h5>
+                <span class="badge bg-secondary rounded-pill px-3 py-2" id="programCount">{{ programs|length }} Programs</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="programsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 30%">Program Name</th>
+                            <th style="width: 15%">Short Name</th>
+                            <th style="width: 10%">Duration</th>
+                            <th style="width: 15%">Faculty</th>
+                            <th style="width: 30%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for program in programs %}
+                        <tr data-faculty="{{ program.faculty.id if program.faculty else '' }}" 
+                            data-duration="{{ program.duration_years }}"
+                            data-name="{{ program.name|lower }}"
+                            data-short="{{ program.short_name|lower if program.short_name else '' }}">
+                            <td class="fw-semibold">
+                                <i class="fas fa-graduation-cap text-primary me-2"></i>
+                                {{ program.name }}
+                            </td>
+                            <td>
+                                {% if program.short_name %}
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-1">{{ program.short_name }}</span>
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1">
+                                    <i class="fas fa-clock me-1"></i>{{ program.duration_years }} Years
+                                </span>
+                            </td>
+                            <td>
+                                {% if program.faculty %}
+                                    <span class="badge bg-info bg-opacity-10 text-info px-3 py-1">
+                                        <i class="fas fa-building me-1"></i>{{ program.faculty.name }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">Not Assigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm gap-1">
+                                    <a href="{{ url_for('admin.edit_program', program_id=program.id) }}" 
+                                       class="btn btn-outline-warning rounded-pill px-3"
+                                       title="Edit Program">
+                                        <i class="fas fa-edit me-1"></i>Edit
+                                    </a>
+                                    <a href="{{ url_for('admin.program_builder', program_id=program.id) }}" 
+                                       class="btn btn-outline-primary rounded-pill px-3"
+                                       title="Build Curriculum">
+                                        <i class="fas fa-layer-group me-1"></i>Curriculum
+                                    </a>
+                                    <button onclick="confirmDelete('{{ program.id }}', '{{ program.name|replace("'", "\\'") }}')" 
+                                            class="btn btn-outline-danger rounded-pill px-3"
+                                            title="Delete Program">
+                                        <i class="fas fa-trash-alt me-1"></i>Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="empty-state">
+                                    <div class="rounded-circle bg-light d-inline-flex p-4 mb-3">
+                                        <i class="fas fa-book-open fa-3x text-muted"></i>
+                                    </div>
+                                    <h6 class="text-muted">No programs found</h6>
+                                    <p class="small text-muted">Click "Create New Program" to get started</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Export Section -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light rounded-4">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-download text-primary me-2"></i>
+                            <span class="small fw-semibold">Export Data</span>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="exportToCSV()">
+                                <i class="fas fa-file-csv me-1"></i>CSV
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="window.print()">
+                                <i class="fas fa-print me-1"></i>Print
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light rounded-4">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            <span class="small fw-semibold">Quick Tips</span>
+                        </div>
+                        <div>
+                            <span class="small text-muted">Click on any program to view details</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="deleteProgramName"></strong>?</p>
+                <p class="text-muted small mb-0">This action cannot be undone. All courses associated with this program will also be affected.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteBtn" class="btn btn-danger rounded-pill px-4">
+                    <i class="fas fa-trash-alt me-2"></i>Delete Program
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table tbody tr {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .table tbody tr:hover {
+        background-color: #f8fafc;
+        transform: translateX(2px);
+    }
+    .btn-outline-warning:hover, .btn-outline-primary:hover, .btn-outline-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #2a5298;
+        box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.1);
+    }
+    .input-group-text {
+        background-color: white;
+    }
+    .badge {
+        font-weight: 500;
+    }
+    @media (max-width: 768px) {
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .btn-group .btn {
+            border-radius: 20px !important;
+        }
+    }
+</style>
+
+<script>
+    // Search and Filter functionality
+    const searchInput = document.getElementById('searchInput');
+    const facultyFilter = document.getElementById('facultyFilter');
+    const durationFilter = document.getElementById('durationFilter');
+    const resetFilters = document.getElementById('resetFilters');
+    const programCount = document.getElementById('programCount');
+    const tableRows = document.querySelectorAll('#programsTable tbody tr');
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const facultyValue = facultyFilter.value;
+        const durationValue = durationFilter.value;
+        
+        let visibleCount = 0;
+        
+        tableRows.forEach(row => {
+            if (row.querySelector('td[colspan]')) return; // Skip empty state row
+            
+            const name = row.getAttribute('data-name') || '';
+            const shortName = row.getAttribute('data-short') || '';
+            const faculty = row.getAttribute('data-faculty') || '';
+            const duration = row.getAttribute('data-duration') || '';
+            
+            let matches = true;
+            
+            if (searchTerm && !name.includes(searchTerm) && !shortName.includes(searchTerm)) {
+                matches = false;
+            }
+            
+            if (facultyValue && faculty !== facultyValue) {
+                matches = false;
+            }
+            
+            if (durationValue && duration !== durationValue) {
+                matches = false;
+            }
+            
+            if (matches) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        programCount.textContent = visibleCount + ' Program' + (visibleCount !== 1 ? 's' : '');
+        
+        // Show empty state if no results
+        const emptyRow = document.querySelector('#programsTable tbody tr td[colspan]');
+        if (visibleCount === 0 && !emptyRow) {
+            const tbody = document.querySelector('#programsTable tbody');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><div class="empty-state"><div class="rounded-circle bg-light d-inline-flex p-4 mb-3"><i class="fas fa-search fa-3x text-muted"></i></div><h6 class="text-muted">No matching programs found</h6><p class="small text-muted">Try adjusting your search or filters</p></div></td></tr>';
+        } else if (visibleCount > 0 && emptyRow) {
+            // Reload the page to restore rows (simpler approach)
+            location.reload();
+        }
+    }
+    
+    searchInput.addEventListener('keyup', filterTable);
+    facultyFilter.addEventListener('change', filterTable);
+    durationFilter.addEventListener('change', filterTable);
+    
+    resetFilters.addEventListener('click', () => {
+        searchInput.value = '';
+        facultyFilter.value = '';
+        durationFilter.value = '';
+        filterTable();
+    });
+    
+    // Delete confirmation modal
+    let deleteUrl = '';
+    
+    function confirmDelete(programId, programName) {
+        deleteUrl = "{{ url_for('admin.delete_program', program_id=0) }}".replace('0', programId);
+        document.getElementById('deleteProgramName').textContent = programName;
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        modal.show();
+    }
+    
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function(e) {
+        if (deleteUrl) {
+            window.location.href = deleteUrl;
+        }
+    });
+    
+    // Make rows clickable to view program details (optional)
+    document.querySelectorAll('#programsTable tbody tr').forEach(row => {
+        if (row.querySelector('td[colspan]')) return;
+        row.addEventListener('click', function(e) {
+            if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON' && !e.target.closest('a') && !e.target.closest('button')) {
+                const editLink = this.querySelector('.btn-outline-warning');
+                if (editLink) {
+                    window.location.href = editLink.href;
+                }
+            }
+        });
+    });
+    
+    // Export to CSV function
+    function exportToCSV() {
+        const rows = document.querySelectorAll('#programsTable tbody tr:visible');
+        let csv = [];
+        csv.push(['Program Name', 'Short Name', 'Duration', 'Faculty']);
+        
+        rows.forEach(row => {
+            const cols = row.querySelectorAll('td');
+            if (cols.length >= 4 && !row.querySelector('td[colspan]')) {
+                csv.push([
+                    cols[0].textContent.replace(/[^\w\s]/g, '').trim(),
+                    cols[1].textContent.trim(),
+                    cols[2].textContent.trim(),
+                    cols[3].textContent.trim()
+                ]);
+            }
+        });
+        
+        const csvContent = csv.map(row => row.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'programs_export.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
+{% endblock %}

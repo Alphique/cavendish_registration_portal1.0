@@ -1,381 +1,436 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Cavendish University - Registration Portal{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <style>
-        :root {
-            --primary-blue: #1a237e;
-            --primary-dark: #0d2453;
-            --primary-light: #3f51b5;
-            --accent-green: #4caf50;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{% block title %}Cavendish University - Registration Portal{% endblock %}</title>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..300,0..1&amp;display=swap" rel="stylesheet"/>
+
+<!-- Bootstrap 5 (kept for compatibility) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "primary": "#0d2453",
+              "secondary": "#1a237e",
+              "background": "#f4f6f9",
+              "surface": "#ffffff",
+              "on-surface": "#1e293b",
+              "on-surface-variant": "#64748b",
+              "outline": "#e2e8f0",
+              "outline-variant": "#cbd5e1",
+              "primary-container": "#1a237e",
+              "on-primary-container": "#ffffff",
+              "secondary-container": "#3f51b5",
+              "on-secondary-container": "#ffffff",
+              "error": "#ef4444",
+              "error-container": "#fee2e2",
+              "on-error": "#ffffff",
+              "on-error-container": "#991b1b"
+            },
+            "borderRadius": {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "2xl": "1rem",
+              "full": "9999px"
+            },
+            "spacing": {
+              "xs": "4px",
+              "sm": "8px",
+              "md": "16px",
+              "lg": "24px",
+              "xl": "32px",
+              "2xl": "48px",
+              "container-max": "1280px"
+            },
+            "fontFamily": {
+              "inter": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+
+<style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            -webkit-font-smoothing: antialiased;
+            background-color: #f4f6f9;
+        }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Flash Toast Notifications */
+        .flash-toast-grid {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 1090;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
         }
 
-        .university-header {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
-            color: white;
-            padding: 1rem 0;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .university-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("{{ url_for('static', filename='images/cavendish2.png') }}") center/cover;
-            opacity: 0.1;
-            z-index: 1;
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 2;
+        .alert-premium-toast {
+            pointer-events: auto;
+            background: white;
+            border: none;
+            border-left: 4px solid;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin: 0;
+            box-shadow: 0 10px 25px rgba(13, 36, 83, 0.08), 0 3px 8px rgba(0, 0, 0, 0.04);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .logo-section {
-            display: flex;
+        .alert-premium-toast.alert-success { border-left-color: #10b981; }
+        .alert-premium-toast.alert-danger { border-left-color: #ef4444; }
+        .alert-premium-toast.alert-warning { border-left-color: #f59e0b; }
+        .alert-premium-toast.alert-info { border-left-color: #3b82f6; }
+
+        .logo-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            display: inline-flex;
             align-items: center;
-            gap: 1.5rem;
+            justify-content: center;
         }
-
+        
         .university-logo {
-            height: 60px;
+            height: 50px;
             width: auto;
-            transition: all 0.3s ease;
-            border-radius: 8px;
+            transition: transform 0.3s ease;
         }
-
+        
         .university-logo:hover {
             transform: scale(1.05);
         }
-
-        .university-title {
-            text-align: left;
+        
+        .btn-hover-effect {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .university-title h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin: 0;
-            background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        
+        .btn-hover-effect:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px -4px rgba(13, 36, 83, 0.25);
         }
-
-        .university-title .tagline {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            margin: 0.25rem 0 0 0;
-            font-weight: 300;
-            letter-spacing: 0.5px;
+        
+        /* Custom colors matching your original */
+        .bg-cu-navy {
+            background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%);
         }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        
+        .text-cu-gold {
+            color: #d4af37;
         }
-
-        .auth-buttons {
-            display: flex;
-            gap: 0.75rem;
+        
+        /* Ensure Bootstrap compatibility */
+        .container {
+            max-width: 1280px;
         }
-
-        .btn-header {
-            padding: 0.5rem 1.25rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 25px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%);
+            border: none;
         }
-
-        .btn-outline-light {
-            color: white;
-            border-color: rgba(255, 255, 255, 0.3);
-            background: transparent;
-        }
-
-        .btn-outline-light:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .btn-light {
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--primary-dark);
-            border: 2px solid transparent;
-        }
-
-        .btn-light:hover {
-            background: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            color: white;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .main-content {
-            min-height: calc(100vh - 200px);
-        }
-
-        .university-footer {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            color: #6c757d;
-            padding: 2rem 0 1rem;
-            margin-top: auto;
-        }
-
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .footer-logo {
-            height: 30px;
-            width: auto;
-            opacity: 0.7;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .footer-link {
-            color: #6c757d;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-        }
-
-        .footer-link:hover {
-            color: var(--primary-blue);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-                gap: 1rem;
-            }
-
-            .logo-section {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .university-title {
-                text-align: center;
-            }
-
-            .university-title h1 {
-                font-size: 1.5rem;
-            }
-
-            .auth-buttons {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .btn-header {
-                width: 100%;
-                text-align: center;
-            }
-
-            .footer-content {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .footer-links {
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .university-title h1 {
-                font-size: 1.3rem;
-            }
-
-            .university-logo {
-                height: 50px;
-            }
-
-            .footer-links {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1a237e 0%, #0d2453 100%);
         }
     </style>
+    
+    {% block extra_css %}{% endblock %}
 </head>
-<body class="d-flex flex-column min-vh-100">
-    <!-- Enhanced Header -->
-    <header class="university-header">
-        <div class="container">
-            <div class="header-content">
-                <!-- Logo and University Name -->
-                <div class="logo-section">
-                    <img src="{{ url_for('static', filename='images/logo3.png') }}" 
-                         alt="Cavendish University Logo" 
-                         class="university-logo">
-                    <div class="university-title">
-                        <h1>Cavendish University</h1>
-                        <p class="tagline">Registration Portal</p>
-                    </div>
-                </div>
+<body class="bg-background text-on-surface min-vh-100 d-flex flex-column">
 
-                <!-- Header Actions -->
-                <div class="header-actions">
-                    {% if session.get('student_id') %}
-                        <!-- Student is logged in -->
-                        <div class="user-info">
-                            <div class="user-avatar">
-                                {{ session.get('student_number', 'S')[0] | upper }}
-                            </div>
-                            <div>
-                                <div class="fw-bold">{{ session.get('student_number', 'Student') }}</div>
-                                <div class="small opacity-75">Student Portal</div>
-                            </div>
-                        </div>
-                        <a href="{{ url_for('student.student_logout') }}" class="btn-header btn-outline-light">
-                            Logout
-                        </a>
-                    {% elif session.get('admin_id') %}
-                        <!-- Admin is logged in -->
-                        <div class="user-info">
-                            <div class="user-avatar">
-                                A
-                            </div>
-                            <div>
-                                <div class="fw-bold">Administrator</div>
-                                <div class="small opacity-75">Admin Portal</div>
-                            </div>
-                        </div>
-                        <a href="{{ url_for('admin.admin_logout') }}" class="btn-header btn-outline-light">
-                            Logout
-                        </a>
-                    {% else %}
-                        <!-- No user logged in -->
-                        <div class="auth-buttons">
-                            <a href="{{ url_for('student.student_login') }}" class="btn-header btn-outline-light">
-                                Student Login
-                            </a>
-                            <a href="{{ url_for('admin.admin_login') }}" class="btn-header btn-light">
-                                Admin Login
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
+<!-- Top Navigation Bar with YOUR blue colors -->
+<header class="fixed w-full top-0 z-50" style="background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%);">
+<div class="flex items-center justify-between px-md py-3" style="max-width: 1280px; margin: 0 auto; width: 100%;">
+<div class="flex items-center gap-sm">
+<a href="{{ url_for('index') }}" class="flex items-center gap-sm text-decoration-none">
+    <div class="logo-container">
+        <img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Cavendish University Logo" class="university-logo">
+    </div>
+    <div class="flex flex-col leading-tight">
+        <h1 class="font-bold text-xl tracking-tight text-white" style="margin: 0;">Cavendish University</h1>
+        <span class="text-[10px] uppercase tracking-widest text-white/75 font-bold">Registration Portal</span>
+    </div>
+</a>
+</div>
+
+<nav class="hidden md:flex items-center gap-xl">
+    {% if session.get('student_id') %}
+        <a href="{{ url_for('student.student_dashboard') }}" class="text-white/80 font-medium text-label-md hover:text-white transition-colors text-decoration-none">Student Dashboard</a>
+    {% endif %}
+    {% if session.get('admin_id') %}
+        <a href="{{ url_for('admin.dashboard') }}" class="text-white/80 font-medium text-label-md hover:text-white transition-colors text-decoration-none">Admin Dashboard</a>
+    {% endif %}
+    <a href="{{ url_for('chatbot.help_page') }}" class="text-white/80 font-medium text-label-md hover:text-white transition-colors text-decoration-none">Help & Support</a>
+</nav>
+
+<div class="flex items-center gap-md">
+    {% if session.get('admin_id') %}
+        <!-- Admin Session -->
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                <i class="fas fa-user-shield text-white"></i>
             </div>
+            <span class="text-sm font-medium text-white">{{ session.get('admin_name', 'Administrator') }}</span>
         </div>
-    </header>
+        <a href="{{ url_for('admin.admin_logout') }}" class="px-lg py-2 rounded-full border border-white/30 text-white font-semibold text-label-md hover:bg-white/10 transition-all text-decoration-none">
+            <i class="fas fa-sign-out-alt me-1"></i>Logout
+        </a>
+    {% elif session.get('student_id') %}
+        <!-- Student Session -->
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                <i class="fas fa-user-graduate text-white"></i>
+            </div>
+            <span class="text-sm font-medium text-white">{{ session.get('student_name', session.get('student_number', 'Student')) }}</span>
+        </div>
+        <a href="{{ url_for('student.student_logout') }}" class="px-lg py-2 rounded-full border border-white/30 text-white font-semibold text-label-md hover:bg-white/10 transition-all text-decoration-none">
+            <i class="fas fa-sign-out-alt me-1"></i>Logout
+        </a>
+    {% else %}
+        <!-- Anonymous User -->
+        <a href="{{ url_for('student.student_login') }}" class="px-lg py-2 rounded-full bg-white text-primary font-semibold text-label-md btn-hover-effect hidden md:block text-decoration-none">
+            <i class="fas fa-user-graduate me-1"></i>Student Login
+        </a>
+        <a href="{{ url_for('admin.admin_login') }}" class="px-lg py-2 rounded-full border border-white/30 text-white font-semibold text-label-md hover:bg-white/10 transition-all hidden md:block text-decoration-none">
+            <i class="fas fa-shield-alt me-1"></i>Staff Login
+        </a>
+    {% endif %}
+    <button class="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border-0 text-white" id="mobile-menu-trigger">
+        <i class="fas fa-bars"></i>
+    </button>
+</div>
+</div>
+</header>
 
-    <!-- Main Content -->
-    <main class="container main-content py-4">
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        <div class="d-flex align-items-center">
+<!-- Global Flash Notification Layer -->
+<div class="flash-toast-grid" id="flashToastContainer">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-premium-toast alert-{{ category }} alert-dismissible fade show" role="alert">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="toast-state-icon">
                             {% if category == 'success' %}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
-                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                                </svg>
+                                <i class="fas fa-check-circle text-success fs-5"></i>
                             {% elif category == 'danger' %}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill text-danger me-2" viewBox="0 0 16 16">
-                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                                </svg>
+                                <i class="fas fa-exclamation-circle text-danger fs-5"></i>
                             {% elif category == 'warning' %}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill text-warning me-2" viewBox="0 0 16 16">
-                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                                </svg>
+                                <i class="fas fa-exclamation-triangle text-warning fs-5"></i>
                             {% else %}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill text-info me-2" viewBox="0 0 16 16">
-                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                                </svg>
+                                <i class="fas fa-info-circle text-info fs-5"></i>
                             {% endif %}
-                            {{ message }}
                         </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <div class="small fw-medium text-dark">{{ message }}</div>
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
 
-        <!-- Page-specific content -->
+<!-- Main Content -->
+<main class="flex-grow-1" style="padding-top: 80px;">
+    <div class="container">
         {% block content %}
-        <!-- Content will be inserted here -->
+        <!-- Child content goes here -->
         {% endblock %}
-    </main>
+    </div>
+</main>
 
-    <!-- Enhanced Footer -->
-    <footer class="university-footer mt-auto">
-        <div class="container">
-            <div class="footer-content">
-                <div class="d-flex align-items-center gap-3">
-                    <img src="{{ url_for('static', filename='images/logo3.png') }}" 
-                         alt="Cavendish University Logo" 
-                         class="footer-logo">
-                    <div>
-                        <p class="mb-0 fw-bold">Cavendish University</p>
-                        <p class="mb-0 small">Registration Portal</p>
-                    </div>
-                </div>
-                
-                <div class="footer-links">
-                    <a href="{{ url_for('index') }}" class="footer-link">Home</a>
-                    <a href="{{ url_for('student.student_login') }}" class="footer-link">Student Portal</a>
-                    <a href="{{ url_for('admin.admin_login') }}" class="footer-link">Admin Portal</a>
-                    <a href="#" class="footer-link">Contact</a>
-                </div>
-            </div>
-            
-            <div class="text-center mt-3 pt-3 border-top">
-                <p class="mb-0 small">&copy; 2025 Cavendish University. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+<!-- Footer with YOUR blue colors -->
+<footer style="background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%);" class="text-white pt-5 pb-4 mt-auto">
+<div class="container">
+<div class="row g-4">
+<div class="col-lg-4 col-md-6">
+<div class="d-flex align-items-center gap-2 mb-3">
+<div class="logo-container bg-white/10">
+<img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Cavendish University Logo" style="height: 35px; width: auto;">
+</div>
+<h5 class="text-white mb-0 fw-bold">Cavendish University</h5>
+</div>
+<p class="text-white-50 small">Dedicated to fostering a culture of innovation, integrity, and lifelong learning for our global community.</p>
+</div>
+<div class="col-lg-2 col-md-6">
+<h6 class="fw-bold text-uppercase small text-white-50 mb-3">Quick Links</h6>
+<ul class="list-unstyled">
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Academic Calendar</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Student Handbook</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Financial Aid</a></li>
+</ul>
+</div>
+<div class="col-lg-3 col-md-6">
+<h6 class="fw-bold text-uppercase small text-white-50 mb-3">Campus Info</h6>
+<ul class="list-unstyled">
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Campus Map</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Safety & Security</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Events Portal</a></li>
+</ul>
+</div>
+<div class="col-lg-3 col-md-6">
+<h6 class="fw-bold text-uppercase small text-white-50 mb-3">Contact</h6>
+<ul class="list-unstyled">
+<li class="mb-2 d-flex gap-2">
+    <i class="fas fa-envelope text-white-50 small"></i>
+    <span class="text-white-50 small">support@cavendish.co.zm</span>
+</li>
+<li class="mb-2 d-flex gap-2">
+    <i class="fas fa-map-marker-alt text-white-50 small"></i>
+    <span class="text-white-50 small">Lusaka, Zambia</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="row mt-4 pt-3 border-top" style="border-color: rgba(255, 255, 255, 0.1);">
+<div class="col-md-6 text-center text-md-start">
+<p class="text-white-50 small mb-0">&copy; 2025 Cavendish University. All rights reserved.</p>
+</div>
+<div class="col-md-6 text-center text-md-end">
+<div class="d-flex gap-3 justify-content-center justify-content-md-end">
+<a href="#" class="text-white-50 text-decoration-none small hover-text-white">Privacy Policy</a>
+<a href="#" class="text-white-50 text-decoration-none small hover-text-white">Terms of Service</a>
+<a href="#" class="text-white-50 text-decoration-none small hover-text-white">Accessibility</a>
+</div>
+</div>
+</div>
+</div>
+</footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Mobile Drawer -->
+<aside class="position-fixed top-0 start-0 h-100 bg-white shadow-lg p-4 d-flex flex-column" style="z-index: 1050; transform: translateX(-100%); transition: transform 0.3s ease; width: 80%; max-width: 320px;" id="mobile-drawer">
+<div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+<div class="d-flex align-items-center gap-2">
+<div class="logo-container" style="background: #f4f6f9;">
+<img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Logo" style="height: 32px; width: auto;">
+</div>
+<span class="fw-bold" style="color: #0d2453;">Cavendish</span>
+</div>
+<button class="btn-close" id="close-drawer"></button>
+</div>
+<nav class="flex-grow-1 d-flex flex-column gap-3">
+    {% if session.get('student_id') %}
+        <a href="{{ url_for('student.student_dashboard') }}" class="text-decoration-none fw-bold py-2 border-bottom" style="color: #0d2453;">Student Dashboard</a>
+    {% endif %}
+    {% if session.get('admin_id') %}
+        <a href="{{ url_for('admin.dashboard') }}" class="text-decoration-none fw-bold py-2 border-bottom" style="color: #0d2453;">Admin Dashboard</a>
+    {% endif %}
+    <a href="{{ url_for('chatbot.help_page') }}" class="text-decoration-none fw-bold py-2 border-bottom" style="color: #64748b;">Help & Support</a>
+</nav>
+<div class="mt-auto pt-3">
+    {% if not session.get('student_id') and not session.get('admin_id') %}
+        <a href="{{ url_for('student.student_login') }}" class="btn w-100 py-2 text-white" style="background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%);">Student Login</a>
+    {% else %}
+        <a href="{{ url_for('student.student_logout') if session.get('student_id') else url_for('admin.admin_logout') }}" class="btn btn-danger w-100 py-2">Logout</a>
+    {% endif %}
+</div>
+</aside>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Mobile drawer functionality
+    const menuBtn = document.getElementById('mobile-menu-trigger');
+    const drawer = document.getElementById('mobile-drawer');
+    const closeBtn = document.getElementById('close-drawer');
+
+    if (menuBtn) {
+        menuBtn.addEventListener('click', () => {
+            drawer.style.transform = 'translateX(0)';
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            drawer.style.transform = 'translateX(-100%)';
+        });
+    }
+
+    // Close drawer when clicking outside
+    document.addEventListener('click', (e) => {
+        if (drawer && drawer.style.transform === 'translateX(0)' && !drawer.contains(e.target) && e.target !== menuBtn) {
+            drawer.style.transform = 'translateX(-100%)';
+        }
+    });
+
+    // Auto-dismiss flash messages after 4.5 seconds
+    document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () {
+            document.querySelectorAll('.alert-premium-toast').forEach(function (alertEl) {
+                alertEl.style.opacity = '0';
+                alertEl.style.transform = 'translateX(20px)';
+                setTimeout(function() {
+                    if (alertEl.parentElement && alertEl.parentElement === document.getElementById('flashToastContainer')) {
+                        alertEl.remove();
+                    }
+                }, 300);
+            });
+        }, 4500);
+    });
+</script>
+
+<style>
+    /* Utility classes */
+    .hover-text-white:hover {
+        color: white !important;
+    }
+    
+    /* Ensure Bootstrap compatibility */
+    .container {
+        max-width: 1280px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        main {
+            padding-top: 100px !important;
+        }
+    }
+    
+    /* Your original colors */
+    .bg-cu-navy {
+        background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%);
+    }
+    
+    .btn-cu-primary {
+        background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%);
+        color: white;
+        border: none;
+    }
+    
+    .btn-cu-primary:hover {
+        background: linear-gradient(135deg, #1a237e 0%, #0d2453 100%);
+    }
+</style>
+
+{% block extra_scripts %}{% endblock %}
 </body>
 </html>

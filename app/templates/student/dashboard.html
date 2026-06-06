@@ -1,611 +1,699 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard - Cavendish University</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #1e3c72;
-            --secondary: #2a5298;
-            --accent: #4dabf7;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-        }
-        
-        body {
-            background-color: #f5f7fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
-        }
-        
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .dashboard-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .welcome-text {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        
-        .welcome-subtext {
-            opacity: 0.9;
-            font-size: 1rem;
-        }
-        
-        .dashboard-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-            border: none;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-        }
-        
-        .card-header {
-            background: white;
-            border-bottom: 1px solid #eaeaea;
-            padding: 20px 25px;
-            border-radius: 12px 12px 0 0 !important;
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: var(--primary);
-        }
-        
-        .card-body {
-            padding: 25px;
-        }
-        
-        .quick-action-card {
-            text-align: center;
-            padding: 25px 20px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s ease;
-        }
-        
-        .quick-action-card:hover {
-            text-decoration: none;
-            color: inherit;
-            background-color: #f8f9fa;
-        }
-        
-        .action-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            color: white;
-            font-size: 1.8rem;
-        }
-        
-        .action-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--primary);
-        }
-        
-        .action-description {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .payment-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-        
-        .payment-table th {
-            background-color: #f8f9fa;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--primary);
-            border-bottom: 2px solid #eaeaea;
-        }
-        
-        .payment-table td {
-            padding: 15px;
-            border-bottom: 1px solid #eaeaea;
-            vertical-align: middle;
-        }
-        
-        .payment-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .payment-table tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-        
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        
-        .status-approved {
-            background-color: #d1edff;
-            color: var(--primary);
-        }
-        
-        .status-rejected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #172b4d 0%, var(--primary) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
-        }
+{% extends "base.html" %}
+{% block title %}Student Dashboard - Cavendish University{% endblock %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
 
-        .btn-logout {
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid white;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-logout:hover {
-            background: white;
-            color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
-        }
-        
-        .upload-area {
-            border: 2px dashed #ddd;
-            border-radius: 10px;
-            padding: 30px;
-            text-align: center;
-            background-color: #fafafa;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .upload-area:hover {
-            border-color: var(--accent);
-            background-color: #f0f7ff;
-        }
-        
-        .upload-icon {
-            font-size: 3rem;
-            color: var(--accent);
-            margin-bottom: 15px;
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
-        .file-name {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-        
-        .empty-state i {
-            font-size: 3rem;
-            color: #ddd;
-            margin-bottom: 15px;
-        }
-        
-        .registration-status-card {
-            border-left: 4px solid var(--primary);
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard-header {
-                padding: 20px;
-            }
-            
-            .welcome-text {
-                font-size: 1.5rem;
-            }
-            
-            .card-body {
-                padding: 20px;
-            }
-            
-            .payment-table {
-                font-size: 0.9rem;
-            }
-            
-            .payment-table th, 
-            .payment-table td {
-                padding: 10px 8px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <!-- Header Section -->
-        <div class="dashboard-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <!-- Modified welcome message to show student name -->
-                    <h1 class="welcome-text">Welcome, {{ student.name }}!</h1>
-                    <p class="welcome-subtext">Here's an overview of your academic information and payments</p>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                    <div class="d-none d-md-block">
-                        <div class="bg-white text-primary p-3 rounded-pill">
-                            <i class="fas fa-user-graduate me-2"></i>
-                            Student Portal
-                        </div>
-                    </div>
-                    <!-- Added logout button -->
-                    <a href="{{ url_for('student.student_logout') }}" class="btn btn-logout">
-                        <i class="fas fa-sign-out-alt me-2"></i>Logout
-                    </a>
-                </div>
+:root {
+    --primary: #1e3c72;
+    --primary-light: #2a5298;
+    --primary-container: #1e3c72;
+    --secondary: #365da3;
+    --surface: #f7f9fb;
+    --surface-container: #ffffff;
+    --surface-container-low: #f2f4f6;
+    --outline-variant: #c4c6d1;
+    --on-surface: #191c1e;
+    --on-surface-variant: #44474f;
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --error: #ef4444;
+    --error-light: #fee2e2;
+}
+
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #eef2f6 100%);
+    font-family: 'Inter', sans-serif;
+}
+
+.dashboard-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px 28px;
+}
+
+/* Glass Morphism Header */
+.dashboard-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    border-radius: 28px;
+    padding: 32px 36px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15);
+}
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+}
+.dashboard-header::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -5%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    border-radius: 50%;
+}
+.portal-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 6px 16px;
+    border-radius: 40px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: white;
+    margin-bottom: 16px;
+}
+.welcome-text {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+}
+.welcome-subtext {
+    color: rgba(255,255,255,0.85);
+    font-size: 0.9rem;
+}
+.user-status-pill {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    padding: 10px 20px;
+    border-radius: 40px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.btn-logout {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 10px 22px;
+    border-radius: 40px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.btn-logout:hover {
+    background: white;
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Quick Action Cards - Modern Glass Design */
+.quick-action-card {
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 20px;
+    padding: 22px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.quick-action-card:hover {
+    transform: translateY(-4px);
+    background: white;
+    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15);
+    border-color: rgba(30,60,114,0.2);
+}
+.action-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    transition: transform 0.3s;
+}
+.quick-action-card:hover .action-icon {
+    transform: scale(1.05);
+}
+.schedule-bg { background: linear-gradient(135deg, #2563eb, #1e40af); color: white; box-shadow: 0 8px 16px -6px rgba(37,99,235,0.3); }
+.payment-bg { background: linear-gradient(135deg, #059669, #047857); color: white; box-shadow: 0 8px 16px -6px rgba(5,150,105,0.3); }
+.support-bg { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; box-shadow: 0 8px 16px -6px rgba(124,58,237,0.3); }
+.action-title { font-weight: 700; font-size: 1rem; color: #1e293b; margin-bottom: 4px; }
+.action-description { font-size: 0.8rem; color: #64748b; }
+
+/* Status Card */
+.status-container-card {
+    background: white;
+    border-radius: 24px;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+.card-header-clean {
+    padding: 20px 28px;
+    border-bottom: 1px solid #eef2f6;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #1e293b;
+}
+.status-alert-box {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    border-radius: 16px;
+}
+.success-box { background: var(--success-light); border-left: 4px solid var(--success); }
+.warning-box { background: var(--warning-light); border-left: 4px solid var(--warning); }
+.info-box { background: #e0f2fe; border-left: 4px solid #0284c7; }
+.alert-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+.success-icon-bg { background: var(--success); color: white; }
+.warning-icon-bg { background: var(--warning); color: white; }
+.info-icon-bg { background: #0284c7; color: white; }
+.alert-box-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; color: #1e293b; }
+.alert-box-desc { font-size: 0.85rem; color: #475569; margin: 0; }
+
+/* Form Sections */
+.form-section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    margin-bottom: 16px;
+}
+.custom-input-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+    display: block;
+}
+.custom-form-select {
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    background: white;
+}
+.custom-form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30,60,114,0.1);
+    outline: none;
+}
+
+/* Upload Dropzone - Premium */
+.upload-dropzone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 20px;
+    padding: 40px 24px;
+    text-align: center;
+    background: #fafcff;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.upload-dropzone:hover {
+    border-color: var(--primary);
+    background: #f0f4fe;
+}
+.upload-icon-box {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 16px;
+}
+.dropzone-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 6px;
+}
+.dropzone-subtitle {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+.dropzone-specs {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-top: 8px;
+}
+.btn-browse-file {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 8px 20px;
+    border-radius: 40px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 16px;
+    transition: all 0.2s;
+}
+.btn-browse-file:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+.file-name-output {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--success);
+}
+
+/* Modern Action Buttons */
+.btn-modern-action-success {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 16px;
+    border-radius: 16px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+.btn-modern-action-success:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px -8px var(--primary);
+}
+.btn-modern-action-success:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+}
+.btn-modern-secondary {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 8px 18px;
+    border-radius: 40px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.btn-modern-secondary:hover {
+    background: #f8fafc;
+    border-color: var(--primary);
+}
+
+/* Course Display */
+.course-card {
+    border: 1px solid #eef2f6;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+}
+.course-card:hover {
+    border-color: var(--primary);
+    background: #f8fafc;
+}
+.mono-text {
+    font-family: 'SF Mono', monospace;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Table Styling */
+.modern-dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.modern-dashboard-table th {
+    background: #f8fafc;
+    padding: 16px 24px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    border-bottom: 1px solid #eef2f6;
+}
+.modern-dashboard-table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #eef2f6;
+    font-size: 0.85rem;
+}
+.modern-dashboard-table tr:hover td {
+    background: #fafcff;
+}
+.table-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 40px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+.status-p-pending { background: #fef3c7; color: #d97706; }
+.status-p-approved { background: #d1fae5; color: #059669; }
+.status-p-rejected { background: #fee2e2; color: #dc2626; }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.dot-warning { background: #d97706; }
+.dot-success { background: #059669; }
+.dot-danger { background: #dc2626; }
+
+/* Empty State */
+.empty-state-wrapper {
+    text-align: center;
+    padding: 60px 24px;
+}
+.empty-icon-circle {
+    width: 80px;
+    height: 80px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+    color: #94a3b8;
+}
+.empty-state-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+.empty-state-subtitle {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+/* Custom Badge */
+.custom-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 40px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.pill-success { background: #d1fae5; color: #059669; }
+.pill-warning { background: #fef3c7; color: #d97706; }
+
+select:disabled {
+    background-color: #f1f5f9;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .dashboard-container { padding: 16px; }
+    .dashboard-header { padding: 24px; }
+    .welcome-text { font-size: 1.5rem; }
+    .quick-action-card { flex-direction: column; text-align: center; }
+    .modern-dashboard-table th, .modern-dashboard-table td { padding: 12px 16px; }
+}
+</style>
+
+<div class="dashboard-container">
+    <!-- Modern Header -->
+    <div class="dashboard-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <div class="portal-badge"><i class="fas fa-university me-2"></i> Cavendish Student Portal</div>
+                <h1 class="welcome-text">Welcome, {{ student.name }}</h1>
+                <p class="welcome-subtext mb-0">Manage your academic profile, course registration, and financial documentation.</p>
             </div>
-        </div>
-        
-        <!-- Quick Actions -->
-        <div class="row mb-4">
-            <div class="col-md-4 mb-3">
-                <a href="{{ url_for('student.download_timetable') }}" class="dashboard-card quick-action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
-                    <div class="action-title">Download Timetable</div>
-                    <div class="action-description">Get your class schedule as PDF</div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="user-status-pill d-none d-md-flex">
+                    <i class="fas fa-user-graduate me-2"></i>Active · {{ student.year_of_study or 'Year' }} {{ student.semester or '' }}
+                </div>
+                <a href="{{ url_for('student.student_logout') }}" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
                 </a>
-            </div>
-            <div class="col-md-4 mb-3">
-                <a href="#payment-section" class="dashboard-card quick-action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-receipt"></i>
-                    </div>
-                    <div class="action-title">Payment History</div>
-                    <div class="action-description">View your payment records and status</div>
-                </a>
-            </div>
-            <div class="col-md-4 mb-3">
-                <a href="{{ url_for('chatbot.help_page') }}" class="dashboard-card quick-action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-question-circle"></i>
-                    </div>
-                    <div class="action-title">Help & Support</div>
-                    <div class="action-description">Get assistance with any issues</div>
-                </a>
-            </div>
-        </div>
-        
-        <!-- Registration Status Section -->
-        <div class="dashboard-card mb-4 registration-status-card">
-            <div class="card-header d-flex align-items-center">
-                <i class="fas fa-clipboard-check me-2"></i>
-                Registration Status
-            </div>
-            <div class="card-body">
-                {% set approved_payment = payments|selectattr("status", "equalto", "approved")|first %}
-                {% if approved_payment %}
-                    <div class="alert alert-success d-flex align-items-center">
-                        <i class="fas fa-check-circle fa-2x me-3"></i>
-                        <div>
-                            <h5 class="mb-1">Payment Approved!</h5>
-                            <p class="mb-0">Your payment was approved on {{ approved_payment.approved_date.strftime('%Y-%m-%d') if approved_payment.approved_date else 'Recently' }}</p>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <a href="{{ url_for('student.download_registration_slip') }}" class="btn btn-success btn-lg me-3">
-                            <i class="fas fa-download me-2"></i> Download Registration Slip
-                        </a>
-                        <a href="{{ url_for('student.download_timetable') }}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-calendar-alt me-2"></i> Download Timetable
-                        </a>
-                    </div>
-                {% else %}
-                    {% set pending_payment = payments|selectattr("status", "equalto", "pending")|first %}
-                    {% if pending_payment %}
-                        <div class="alert alert-warning d-flex align-items-center">
-                            <i class="fas fa-clock fa-2x me-3"></i>
-                            <div>
-                                <h5 class="mb-1">Payment Under Review</h5>
-                                <p class="mb-0">Your payment submitted on {{ pending_payment.submitted_date.strftime('%Y-%m-%d') }} is pending approval.</p>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="alert alert-info d-flex align-items-center">
-                            <i class="fas fa-info-circle fa-2x me-3"></i>
-                            <div>
-                                <h5 class="mb-1">No Payment Submitted</h5>
-                                <p class="mb-0">Please upload a payment slip to begin the registration process.</p>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-            </div>
-        </div>
-        
-        <div class="row">
-            <!-- Payment Upload Section -->
-            <div class="col-lg-6 mb-4">
-                <div class="dashboard-card">
-                    <div class="card-header d-flex align-items-center">
-                        <i class="fas fa-file-upload me-2"></i>
-                        Submit Payment Slip
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="{{ url_for('student.upload_payment') }}" enctype="multipart/form-data" id="paymentForm">
-                            <div class="upload-area" id="uploadArea">
-                                <div class="upload-icon">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                </div>
-                                <h5>Upload Payment Slip</h5>
-                                <p class="text-muted">Drag & drop or click to select a file</p>
-                                <p class="small text-muted">Supported formats: JPG, PNG, PDF (Max: 5MB)</p>
-                                <input type="file" name="payment_slip" id="payment_slip" class="file-input" accept=".jpg,.jpeg,.png,.pdf" required>
-                                <button type="button" class="btn btn-outline-primary mt-2" onclick="document.getElementById('payment_slip').click()">
-                                    <i class="fas fa-folder-open me-1"></i> Choose File
-                                </button>
-                                <div id="fileName" class="file-name"></div>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100 mt-3">
-                                <i class="fas fa-paper-plane me-2"></i> Submit Payment Slip
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Payment History Section -->
-            <div class="col-lg-6 mb-4">
-                <div class="dashboard-card">
-                    <div class="card-header d-flex align-items-center">
-                        <i class="fas fa-history me-2"></i>
-                        Recent Payment History
-                    </div>
-                    <div class="card-body">
-                        {% if payments %}
-                            <div class="table-responsive">
-                                <table class="payment-table">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Status</th>
-                                            <th>Date</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for payment in payments %}
-                                        <tr>
-                                            <td>#{{ payment.id }}</td>
-                                            <td>
-                                                {% if payment.status == 'pending' %}
-                                                    <span class="status-badge status-pending">
-                                                        <i class="fas fa-clock me-1"></i> Pending
-                                                    </span>
-                                                {% elif payment.status == 'approved' %}
-                                                    <span class="status-badge status-approved">
-                                                        <i class="fas fa-check me-1"></i> Approved
-                                                    </span>
-                                                {% elif payment.status == 'rejected' %}
-                                                    <span class="status-badge status-rejected">
-                                                        <i class="fas fa-times me-1"></i> Rejected
-                                                    </span>
-                                                {% else %}
-                                                    <span class="status-badge">{{ payment.status }}</span>
-                                                {% endif %}
-                                            </td>
-                                            <td>{{ payment.submitted_date.strftime('%d %b %Y') }}</td>
-                                            <td>
-                                                {% if payment.slip_filename %}
-                                                    <a href="{{ url_for('student.uploaded_file', filename=payment.slip_filename) }}" 
-                                                       target="_blank" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-eye me-1"></i> View
-                                                    </a>
-                                                {% else %}
-                                                    <span class="text-muted">N/A</span>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="text-center mt-3">
-                                <a href="#payment-section" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-list me-1"></i> View All Payments
-                                </a>
-                            </div>
-                        {% else %}
-                            <div class="empty-state">
-                                <i class="fas fa-receipt"></i>
-                                <h5>No Payments Found</h5>
-                                <p class="text-muted">You haven't submitted any payment slips yet.</p>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Full Payment History Section -->
-        <div id="payment-section" class="dashboard-card mb-4">
-            <div class="card-header d-flex align-items-center">
-                <i class="fas fa-file-invoice-dollar me-2"></i>
-                Your Payment History
-            </div>
-            <div class="card-body">
-                {% if payments %}
-                    <div class="table-responsive">
-                        <table class="payment-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Status</th>
-                                    <th>Description</th>
-                                    <th>Submitted Date</th>
-                                    <th>Slip</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for payment in payments %}
-                                <tr>
-                                    <td>#{{ payment.id }}</td>
-                                    <td>
-                                        {% if payment.status == 'pending' %}
-                                            <span class="status-badge status-pending">
-                                                <i class="fas fa-clock me-1"></i> Pending
-                                            </span>
-                                        {% elif payment.status == 'approved' %}
-                                            <span class="status-badge status-approved">
-                                                <i class="fas fa-check me-1"></i> Approved
-                                            </span>
-                                        {% elif payment.status == 'rejected' %}
-                                            <span class="status-badge status-rejected">
-                                                <i class="fas fa-times me-1"></i> Rejected
-                                            </span>
-                                        {% else %}
-                                            <span class="status-badge">{{ payment.status }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ payment.description or 'No description' }}</td>
-                                    <td>{{ payment.submitted_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                                    <td>
-                                        {% if payment.slip_filename %}
-                                            <a href="{{ url_for('student.uploaded_file', filename=payment.slip_filename) }}" 
-                                               target="_blank" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-external-link-alt me-1"></i> View Slip
-                                            </a>
-                                        {% else %}
-                                            <span class="text-muted">N/A</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-receipt"></i>
-                        <h5>No Payment History</h5>
-                        <p class="text-muted">You haven't submitted any payment slips yet.</p>
-                    </div>
-                {% endif %}
             </div>
         </div>
     </div>
 
-    <script>
-        // File upload handling
-        document.getElementById('payment_slip').addEventListener('change', function(e) {
-            const fileName = document.getElementById('fileName');
-            if (this.files.length > 0) {
-                fileName.textContent = this.files[0].name;
-                document.getElementById('uploadArea').style.borderColor = '#4dabf7';
-                document.getElementById('uploadArea').style.backgroundColor = '#f0f7ff';
-            } else {
-                fileName.textContent = '';
-                document.getElementById('uploadArea').style.borderColor = '#ddd';
-                document.getElementById('uploadArea').style.backgroundColor = '#fafafa';
-            }
-        });
-        
-        // Drag and drop functionality
-        const uploadArea = document.getElementById('uploadArea');
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, preventDefaults, false);
-        });
-        
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, highlight, false);
-        });
-        
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, unhighlight, false);
-        });
-        
-        function highlight() {
-            uploadArea.style.borderColor = '#4dabf7';
-            uploadArea.style.backgroundColor = '#f0f7ff';
-        }
-        
-        function unhighlight() {
-            uploadArea.style.borderColor = '#ddd';
-            uploadArea.style.backgroundColor = '#fafafa';
-        }
-        
-        uploadArea.addEventListener('drop', handleDrop, false);
-        
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            document.getElementById('payment_slip').files = files;
-            
-            const fileName = document.getElementById('fileName');
-            if (files.length > 0) {
-                fileName.textContent = files[0].name;
-            }
-        }
-    </script>
-</body>
-</html>
+    <!-- Quick Actions Grid -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <a href="{{ url_for('student.download_timetable') }}" class="quick-action-card">
+                <div class="action-icon schedule-bg"><i class="fas fa-calendar-alt"></i></div>
+                <div><div class="action-title">Download Timetable</div><div class="action-description">Access your complete class schedule</div></div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="#payment-section" class="quick-action-card">
+                <div class="action-icon payment-bg"><i class="fas fa-receipt"></i></div>
+                <div><div class="action-title">Payment History</div><div class="action-description">Review submitted slips and records</div></div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{{ url_for('chatbot.help_page') }}" class="quick-action-card">
+                <div class="action-icon support-bg"><i class="fas fa-question-circle"></i></div>
+                <div><div class="action-title">Help & Support</div><div class="action-description">Connect with student services</div></div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Registration Status -->
+    <div class="status-container-card mb-4">
+        <div class="card-header-clean"><i class="fas fa-clipboard-check text-primary me-2"></i> Registration Status Tracker</div>
+        <div class="card-body p-4">
+            {% if approved_payment and approved_payment.status == 'approved' %}
+                <div class="status-alert-box success-box">
+                    <div class="alert-icon-wrapper success-icon-bg"><i class="fas fa-check-circle"></i></div>
+                    <div><h5 class="alert-box-title">Registration Complete</h5><p class="alert-box-desc">Payment approved on {{ approved_payment.approved_date.strftime('%Y-%m-%d') if approved_payment.approved_date else 'Recently' }}. Your portal is fully unlocked.</p></div>
+                </div>
+            {% else %}
+                {% set pending_payment = payments|selectattr("status", "equalto", "pending")|first %}
+                {% if pending_payment %}
+                    <div class="status-alert-box warning-box">
+                        <div class="alert-icon-wrapper warning-icon-bg"><i class="fas fa-clock"></i></div>
+                        <div><h5 class="alert-box-title">Payment Under Review</h5><p class="alert-box-desc">Submitted on {{ pending_payment.submitted_date.strftime('%Y-%m-%d') }} - awaiting accounting verification.</p></div>
+                    </div>
+                {% else %}
+                    <div class="status-alert-box info-box">
+                        <div class="alert-icon-wrapper info-icon-bg"><i class="fas fa-info-circle"></i></div>
+                        <div><h5 class="alert-box-title">Registration Required</h5><p class="alert-box-desc">Complete the form below to begin your semester registration.</p></div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Unified Registration Form -->
+    <div class="status-container-card mb-4">
+        <div class="card-header-clean d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-file-alt text-success me-2"></i> Academic Registration Workspace</span>
+            <span class="custom-badge-pill pill-warning">Step-by-Step</span>
+        </div>
+        <div class="card-body p-4">
+            <form id="unifiedRegistrationForm" enctype="multipart/form-data">
+                <div class="row g-4 mb-4">
+                    <div class="col-md-12"><div class="form-section-title"><i class="fas fa-graduation-cap me-2"></i>Step 1: Academic Alignment</div></div>
+                    <div class="col-md-5"><label class="custom-input-label">Degree Program <span class="text-danger">*</span></label><select id="reg_program" class="custom-form-select w-100" required><option value="">Select Program</option></select></div>
+                    <div class="col-md-3"><label class="custom-input-label">Year Level <span class="text-danger">*</span></label><select id="reg_year" class="custom-form-select w-100" required><option value="">Select Year</option><option value="1">Year 1</option><option value="2">Year 2</option><option value="3">Year 3</option><option value="4">Year 4</option></select></div>
+                    <div class="col-md-4"><label class="custom-input-label">Semester <span class="text-danger">*</span></label><select id="reg_semester" class="custom-form-select w-100" disabled required><option value="">Select Program & Year First</option></select></div>
+                </div>
+
+                <div id="regCoursesContainer" class="mb-4"><div class="alert alert-secondary small">Select program, year, and semester to view available courses</div></div>
+
+                <div class="row mb-4">
+                    <div class="col-md-12"><div class="form-section-title"><i class="fas fa-credit-card me-2"></i>Step 2: Financial Documentation</div></div>
+                    <div class="col-md-12">
+                        <div class="upload-dropzone" id="uploadArea">
+                            <div class="upload-icon-box"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <h5 class="dropzone-title">Upload Payment Voucher</h5>
+                            <p class="dropzone-subtitle">Drag & drop or click to browse</p>
+                            <div class="dropzone-specs">Supported: JPG, PNG, PDF | Max: 5MB</div>
+                            <input type="file" name="payment_slip" id="payment_slip" class="file-input" accept=".jpg,.jpeg,.png,.pdf" required>
+                            <button type="button" class="btn-browse-file" onclick="document.getElementById('payment_slip').click()"><i class="fas fa-folder-open me-2"></i>Browse Files</button>
+                            <div id="fileName" class="file-name-output"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <button type="submit" id="submitApplicationBtn" class="btn-modern-action-success w-100" disabled><i class="fas fa-paper-plane me-2"></i>Submit Registration Application</button>
+                <p class="text-muted text-center small mt-3"><i class="fas fa-info-circle me-1"></i>Your application will be reviewed after payment approval</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Approved Courses Section -->
+    <div class="status-container-card mb-4">
+        <div class="card-header-clean"><i class="fas fa-chalkboard text-purple me-2"></i> Approved Course Registry</div>
+        <div class="card-body p-4">
+            <div class="row g-3 mb-4">
+                <div class="col-md-5"><label class="custom-input-label">Program</label><select id="dash_program" class="custom-form-select w-100"><option value="">Select Program</option></select></div>
+                <div class="col-md-3"><label class="custom-input-label">Year</label><select id="dash_year" class="custom-form-select w-100"><option value="">Select Year</option><option value="1">Year 1</option><option value="2">Year 2</option><option value="3">Year 3</option><option value="4">Year 4</option></select></div>
+                <div class="col-md-4"><label class="custom-input-label">Semester</label><select id="dash_semester" class="custom-form-select w-100" disabled><option value="">Select Program & Year First</option></select></div>
+            </div>
+            <div id="dashCoursesContainer"><div class="alert alert-secondary small">Select program, year, and semester to view your approved courses</div></div>
+            <hr class="my-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                {% if approved_payment and approved_payment.status == 'approved' %}<span class="custom-badge-pill pill-success"><span class="badge-dot dot-success"></span>Financial Clearance Verified</span>{% else %}<span class="custom-badge-pill pill-warning"><span class="badge-dot dot-warning"></span>Pending Financial Audit</span>{% endif %}
+                <div class="d-flex gap-2">{% if registration_slip %}<a href="{{ url_for('student.view_registration_slip') }}" class="btn-modern-secondary"><i class="fas fa-download me-2"></i>Registration Slip</a>{% endif %}<a href="{{ url_for('student.download_timetable') }}" class="btn-modern-secondary"><i class="fas fa-calendar-alt me-2"></i>Timetable</a></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment History -->
+    <div id="payment-section" class="status-container-card mb-4">
+        <div class="card-header-clean"><i class="fas fa-history me-2"></i> Financial Transaction Log</div>
+        <div class="card-body p-0">
+            {% if payments %}
+                <div class="table-responsive">
+                    <table class="modern-dashboard-table">
+                        <thead><tr><th>ID</th><th>Status</th><th>Description</th><th>Date</th><th>Slip</th>{% if payments|selectattr("status", "equalto", "pending")|list %}<th class="text-end">Action</th>{% endif %}</tr></thead>
+                        <tbody>{% for payment in payments %}<tr><td><span class="mono-text">#{{ payment.id }}</span></td>
+                        <td>{% if payment.status == 'pending' %}<span class="table-badge status-p-pending"><span class="badge-dot dot-warning"></span>Pending</span>{% elif payment.status == 'approved' %}<span class="table-badge status-p-approved"><span class="badge-dot dot-success"></span>Approved</span>{% elif payment.status == 'rejected' %}<span class="table-badge status-p-rejected"><span class="badge-dot dot-danger"></span>Rejected</span>{% else %}<span class="table-badge">{{ payment.status }}</span>{% endif %}</td>
+                        <td>{{ payment.description or 'Registration Fee' }}</td><td>{{ payment.submitted_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{% if payment.slip_filename %}<a href="{{ url_for('student.uploaded_file', filename=payment.slip_filename) }}" target="_blank" class="text-primary fw-semibold small">View Slip</a>{% else %}<span class="text-muted">N/A</span>{% endif %}</td>
+                        {% if payment.status == 'pending' %}<td class="text-end"><form method="POST" action="{{ url_for('student.delete_payment', payment_id=payment.id) }}" onsubmit="return confirm('Delete this payment?')"><button type="submit" class="btn btn-sm btn-outline-danger border-0"><i class="fas fa-trash-alt"></i></button></form></td>{% endif %}</tr>{% endfor %}</tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state-wrapper"><div class="empty-icon-circle"><i class="fas fa-receipt"></i></div><h5 class="empty-state-title">No Payment Records</h5><p class="empty-state-subtitle">You haven't submitted any payment slips yet.</p></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const fileInput = document.getElementById('payment_slip');
+    const fileName = document.getElementById('fileName');
+    if(fileInput) { fileInput.addEventListener('change', function() { if(fileInput.files.length > 0) { fileName.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> Loaded: ' + fileInput.files[0].name; } else { fileName.innerHTML = ''; } }); }
+    const uploadArea = document.getElementById('uploadArea');
+    if(uploadArea) { uploadArea.addEventListener('click', function(e) { if(e.target !== fileInput && !fileInput.contains(e.target)) { fileInput.click(); } }); }
+
+    const regProgram = document.getElementById("reg_program");
+    const regYear = document.getElementById("reg_year");
+    const regSemester = document.getElementById("reg_semester");
+    const regCoursesContainer = document.getElementById("regCoursesContainer");
+    const submitBtn = document.getElementById("submitApplicationBtn");
+    const unifiedForm = document.getElementById("unifiedRegistrationForm");
+    const dashProgram = document.getElementById("dash_program");
+    const dashYear = document.getElementById("dash_year");
+    const dashSemester = document.getElementById("dash_semester");
+    const dashCoursesContainer = document.getElementById("dashCoursesContainer");
+
+    let availableCourses = [];
+    let selectedFile = null;
+
+    if(fileInput) { fileInput.addEventListener('change', function(e) { selectedFile = e.target.files[0]; validateForm(); }); }
+
+    function validateForm() {
+        const programSelected = regProgram.value && regProgram.value !== "";
+        const yearSelected = regYear.value && regYear.value !== "";
+        const semesterSelected = regSemester.value && regSemester.value !== "";
+        const coursesAvailable = availableCourses.length > 0;
+        const fileSelected = selectedFile !== null;
+        if(programSelected && yearSelected && semesterSelected && coursesAvailable && fileSelected) { submitBtn.disabled = false; } else { submitBtn.disabled = true; }
+    }
+
+    function loadPrograms() {
+        fetch("/student/get-programs").then(res=>res.json()).then(data=>{
+            const programs = data.programs || [];
+            if(regProgram) { regProgram.innerHTML = '<option value="">Select Program</option>'; programs.forEach(p=>{ let opt = document.createElement("option"); opt.value = p.id; opt.textContent = p.name; regProgram.appendChild(opt); }); }
+            if(dashProgram) { dashProgram.innerHTML = '<option value="">Select Program</option>'; programs.forEach(p=>{ let opt = document.createElement("option"); opt.value = p.id; opt.textContent = p.name; dashProgram.appendChild(opt); }); }
+        }).catch(err=>console.error("Programs error:", err));
+    }
+
+    function loadRegSemesters() {
+        let programId = regProgram.value, year = regYear.value;
+        regSemester.innerHTML = '<option value="">Select Semester</option>';
+        regSemester.disabled = true;
+        if(!programId || !year) { regSemester.disabled = true; regCoursesContainer.innerHTML = '<div class="alert alert-secondary small">Select program and year first</div>'; validateForm(); return; }
+        fetch(`/student/get-semesters/${programId}/${year}`).then(res=>res.json()).then(data=>{
+            const semesters = data.semesters || [];
+            if(semesters.length === 0) { regSemester.innerHTML = '<option value="">No semesters available</option>'; regSemester.disabled = true; validateForm(); return; }
+            regSemester.disabled = false;
+            semesters.forEach(sem=>{ let option = document.createElement("option"); option.value = sem; option.textContent = sem; regSemester.appendChild(option); });
+            validateForm();
+        }).catch(()=>{ regSemester.innerHTML = '<option value="">Error loading semesters</option>'; regSemester.disabled = true; validateForm(); });
+    }
+
+    function loadRegCourses() {
+        let programId = regProgram.value, year = regYear.value, semester = regSemester.value;
+        if(!programId || !year || !semester) { regCoursesContainer.innerHTML = '<div class="alert alert-secondary small">Select program, year, and semester to view available courses</div>'; availableCourses = []; validateForm(); return; }
+        regCoursesContainer.innerHTML = '<div class="text-muted small">Loading available courses...</div>';
+        fetch(`/student/get-available-courses?program_id=${programId}&year=${year}&semester=${encodeURIComponent(semester)}`).then(res=>res.json()).then(data=>{
+            availableCourses = data.courses || [];
+            if(availableCourses.length === 0) { regCoursesContainer.innerHTML = '<div class="alert alert-warning small">No courses available for this selection</div>'; validateForm(); return; }
+            let html = '<div class="border rounded-3 p-3 bg-white"><h6 class="mb-3 fw-bold small text-uppercase text-muted">Available Courses</h6><div class="list-group list-group-flush">';
+            availableCourses.forEach(c=>{ html += `<div class="course-card d-flex justify-content-between align-items-center"><span><span class="mono-text fw-bold me-2">${c.code}</span> ${c.name}</span><span class="badge bg-secondary bg-opacity-10 text-dark px-3 py-1 rounded-pill">${c.credits||0} Credits</span></div>`; });
+            html += '</div><div class="mt-3 text-muted small"><i class="fas fa-info-circle me-1"></i>These courses will be submitted for approval</div></div>';
+            regCoursesContainer.innerHTML = html;
+            validateForm();
+        }).catch(()=>{ regCoursesContainer.innerHTML = '<div class="alert alert-danger small">Failed to load courses</div>'; availableCourses = []; validateForm(); });
+    }
+
+    async function submitCompleteRegistration(event) {
+        event.preventDefault();
+        const programId = regProgram.value, year = regYear.value, semester = regSemester.value;
+        if(!programId || !year || !semester) { alert("Please complete all registration fields"); return; }
+        if(availableCourses.length === 0) { alert("No courses available for registration"); return; }
+        if(!selectedFile) { alert("Please upload a payment slip"); return; }
+        submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+        try {
+            const formData = new FormData(); formData.append('payment_slip', selectedFile);
+            const paymentResponse = await fetch("/student/upload_payment_ajax", { method: "POST", body: formData });
+            const paymentResult = await paymentResponse.json();
+            if(!paymentResult.success) throw new Error(paymentResult.error || "Payment upload failed");
+            const registrationResponse = await fetch("/student/submit-registration", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ program_id: parseInt(programId), year_level: parseInt(year), semester_type: semester, courses: availableCourses.map(c=>c.id) }) });
+            const registrationResult = await registrationResponse.json();
+            if(registrationResult.success) { alert("Registration submitted successfully! Awaiting approval."); submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Submitted'; submitBtn.classList.remove("btn-modern-action-success"); submitBtn.classList.add("btn-secondary"); selectedFile = null; if(fileInput) fileInput.value = ''; if(fileName) fileName.innerHTML = ''; setTimeout(()=>window.location.reload(), 2000); } else { throw new Error(registrationResult.error || "Registration submission failed"); }
+        } catch(err) { alert("Error: " + err.message); submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Registration Application'; }
+    }
+
+    function loadDashSemesters() {
+        let programId = dashProgram.value, year = dashYear.value;
+        dashSemester.innerHTML = '<option value="">Select Semester</option>'; dashSemester.disabled = true;
+        if(!programId || !year) { dashSemester.disabled = true; dashCoursesContainer.innerHTML = '<div class="alert alert-secondary small">Select program and year first</div>'; return; }
+        fetch(`/student/get-semesters/${programId}/${year}`).then(res=>res.json()).then(data=>{
+            const semesters = data.semesters || [];
+            if(semesters.length === 0) { dashSemester.innerHTML = '<option value="">No semesters available</option>'; dashSemester.disabled = true; return; }
+            dashSemester.disabled = false;
+            semesters.forEach(sem=>{ let option = document.createElement("option"); option.value = sem; option.textContent = sem; dashSemester.appendChild(option); });
+        }).catch(()=>{ dashSemester.innerHTML = '<option value="">Error loading semesters</option>'; dashSemester.disabled = true; });
+    }
+
+    function loadDashCourses() {
+        let programId = dashProgram.value, year = dashYear.value, semester = dashSemester.value;
+        if(!programId || !year || !semester) { dashCoursesContainer.innerHTML = '<div class="alert alert-secondary small">Select program, year, and semester to view approved courses</div>'; return; }
+        dashCoursesContainer.innerHTML = '<div class="text-muted small">Loading approved courses...</div>';
+        fetch(`/student/get-approved-courses?program_id=${programId}&year=${year}&semester=${encodeURIComponent(semester)}`).then(res=>res.json()).then(data=>{
+            const courses = data.courses || [];
+            if(courses.length === 0) { dashCoursesContainer.innerHTML = '<div class="alert alert-warning small">No approved courses found</div>'; return; }
+            let html = '<div class="border rounded-3 p-3 bg-white"><h6 class="mb-3 text-success fw-bold small text-uppercase"><i class="fas fa-check-circle me-1"></i>Approved Courses</h6><div class="list-group list-group-flush">';
+            courses.forEach(c=>{ html += `<div class="course-card d-flex justify-content-between align-items-center"><span><span class="mono-text fw-bold me-2">${c.code}</span> ${c.name}</span><span class="custom-badge-pill pill-success py-1 px-3">Approved</span></div>`; });
+            html += '</div></div>'; dashCoursesContainer.innerHTML = html;
+        }).catch(()=>{ dashCoursesContainer.innerHTML = '<div class="alert alert-danger small">Failed to load approved courses</div>'; });
+    }
+
+    if(regProgram) regProgram.addEventListener("change", () => { loadRegSemesters(); regSemester.value = ""; regCoursesContainer.innerHTML = '<div class="alert alert-secondary small">Select semester to view courses</div>'; availableCourses = []; validateForm(); });
+    if(regYear) regYear.addEventListener("change", () => { loadRegSemesters(); regSemester.value = ""; regCoursesContainer.innerHTML = '<div class="alert alert-secondary small">Select semester to view courses</div>'; availableCourses = []; validateForm(); });
+    if(regSemester) regSemester.addEventListener("change", () => { loadRegCourses(); validateForm(); });
+    if(unifiedForm) unifiedForm.addEventListener("submit", submitCompleteRegistration);
+    if(dashProgram) dashProgram.addEventListener("change", () => { loadDashSemesters(); dashSemester.value = ""; dashCoursesContainer.innerHTML = '<div class="alert alert-secondary small">Select semester to view approved courses</div>'; });
+    if(dashYear) dashYear.addEventListener("change", () => { loadDashSemesters(); dashSemester.value = ""; dashCoursesContainer.innerHTML = '<div class="alert alert-secondary small">Select semester to view approved courses</div>'; });
+    if(dashSemester) dashSemester.addEventListener("change", loadDashCourses);
+    loadPrograms();
+});
+</script>
+{% endblock %}
