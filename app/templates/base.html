@@ -2,7 +2,7 @@
 <html class="light" lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <title>{% block title %}Cavendish University - Registration Portal{% endblock %}</title>
 
 <!-- Tailwind CSS -->
@@ -160,6 +160,31 @@
         .btn-primary:hover {
             background: linear-gradient(135deg, #1a237e 0%, #0d2453 100%);
         }
+
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1a237e;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0d2453;
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -167,7 +192,7 @@
 <body class="bg-background text-on-surface min-vh-100 d-flex flex-column">
 
 <!-- Top Navigation Bar with YOUR blue colors -->
-<header class="fixed w-full top-0 z-50" style="background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%);">
+<header class="fixed w-full top-0 z-50" style="background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%); box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
 <div class="flex items-center justify-between px-md py-3" style="max-width: 1280px; margin: 0 auto; width: 100%;">
 <div class="flex items-center gap-sm">
 <a href="{{ url_for('index') }}" class="flex items-center gap-sm text-decoration-none">
@@ -183,12 +208,18 @@
 
 <nav class="hidden md:flex items-center gap-xl">
     {% if session.get('student_id') %}
-        <a href="{{ url_for('student.student_dashboard') }}" class="text-white/80 font-medium text-label-md hover:text-white transition-colors text-decoration-none">Student Dashboard</a>
+        <a href="{{ url_for('student.student_dashboard') }}" class="text-white/80 font-medium text-label-md hover:text-white transition-colors text-decoration-none">
+            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+        </a>
     {% endif %}
     {% if session.get('admin_id') %}
-        <a href="{{ url_for('admin.dashboard') }}" class="text-white/80 font-medium text-label-md hover:text-white transition-colors text-decoration-none">Admin Dashboard</a>
+        <a href="{{ url_for('admin.dashboard') }}" class="text-white/80 font-medium text-label-md hover:text-white transition-colors text-decoration-none">
+            <i class="fas fa-shield-alt me-1"></i>Admin
+        </a>
     {% endif %}
-    <a href="{{ url_for('chatbot.help_page') }}" class="text-white/80 font-medium text-label-md hover:text-white transition-colors text-decoration-none">Help & Support</a>
+    <a href="{{ url_for('chatbot.help_page') }}" class="text-white/80 font-medium text-label-md hover:text-white transition-colors text-decoration-none">
+        <i class="fas fa-headset me-1"></i>Help & Support
+    </a>
 </nav>
 
 <div class="flex items-center gap-md">
@@ -259,14 +290,14 @@
 
 <!-- Main Content -->
 <main class="flex-grow-1" style="padding-top: 80px;">
-    <div class="container">
+    <div class="container px-3 px-md-4">
         {% block content %}
         <!-- Child content goes here -->
         {% endblock %}
     </div>
 </main>
 
-<!-- Footer with YOUR blue colors -->
+<!-- Footer with YOUR blue colors and Zambian contact details -->
 <footer style="background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%);" class="text-white pt-5 pb-4 mt-auto">
 <div class="container">
 <div class="row g-4">
@@ -278,33 +309,55 @@
 <h5 class="text-white mb-0 fw-bold">Cavendish University</h5>
 </div>
 <p class="text-white-50 small">Dedicated to fostering a culture of innovation, integrity, and lifelong learning for our global community.</p>
+<div class="mt-3">
+    <div class="d-flex gap-3">
+        <a href="#" class="text-white-50 hover-text-white transition-all" style="font-size: 1.2rem;"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="text-white-50 hover-text-white transition-all" style="font-size: 1.2rem;"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="text-white-50 hover-text-white transition-all" style="font-size: 1.2rem;"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#" class="text-white-50 hover-text-white transition-all" style="font-size: 1.2rem;"><i class="fab fa-instagram"></i></a>
+    </div>
+</div>
 </div>
 <div class="col-lg-2 col-md-6">
 <h6 class="fw-bold text-uppercase small text-white-50 mb-3">Quick Links</h6>
 <ul class="list-unstyled">
-<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Academic Calendar</a></li>
-<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Student Handbook</a></li>
-<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Financial Aid</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white transition-all">Academic Calendar</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white transition-all">Student Handbook</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white transition-all">Financial Aid</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white transition-all">Career Services</a></li>
 </ul>
 </div>
 <div class="col-lg-3 col-md-6">
 <h6 class="fw-bold text-uppercase small text-white-50 mb-3">Campus Info</h6>
 <ul class="list-unstyled">
-<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Campus Map</a></li>
-<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Safety & Security</a></li>
-<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white">Events Portal</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white transition-all">Campus Map</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white transition-all">Safety & Security</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white transition-all">Events Portal</a></li>
+<li class="mb-2"><a href="#" class="text-white-50 text-decoration-none small hover-text-white transition-all">Library Resources</a></li>
 </ul>
 </div>
 <div class="col-lg-3 col-md-6">
-<h6 class="fw-bold text-uppercase small text-white-50 mb-3">Contact</h6>
+<h6 class="fw-bold text-uppercase small text-white-50 mb-3">Contact Us</h6>
 <ul class="list-unstyled">
-<li class="mb-2 d-flex gap-2">
-    <i class="fas fa-envelope text-white-50 small"></i>
-    <span class="text-white-50 small">support@cavendish.co.zm</span>
+<li class="mb-3 d-flex gap-2">
+    <i class="fas fa-map-marker-alt text-white-50 small mt-1"></i>
+    <span class="text-white-50 small">Plot 15267 Chindo Road,<br>Lusaka, Zambia</span>
 </li>
 <li class="mb-2 d-flex gap-2">
-    <i class="fas fa-map-marker-alt text-white-50 small"></i>
-    <span class="text-white-50 small">Lusaka, Zambia</span>
+    <i class="fas fa-phone-alt text-white-50 small"></i>
+    <span class="text-white-50 small">+260 211 387 700</span>
+</li>
+<li class="mb-2 d-flex gap-2">
+    <i class="fas fa-mobile-alt text-white-50 small"></i>
+    <span class="text-white-50 small">+260 977 123 456</span>
+</li>
+<li class="mb-2 d-flex gap-2">
+    <i class="fas fa-envelope text-white-50 small"></i>
+    <span class="text-white-50 small">info@cavendish.co.zm</span>
+</li>
+<li class="mb-2 d-flex gap-2">
+    <i class="fas fa-clock text-white-50 small"></i>
+    <span class="text-white-50 small">Mon-Fri: 8:00 AM - 5:00 PM</span>
 </li>
 </ul>
 </div>
@@ -315,9 +368,12 @@
 </div>
 <div class="col-md-6 text-center text-md-end">
 <div class="d-flex gap-3 justify-content-center justify-content-md-end">
-<a href="#" class="text-white-50 text-decoration-none small hover-text-white">Privacy Policy</a>
-<a href="#" class="text-white-50 text-decoration-none small hover-text-white">Terms of Service</a>
-<a href="#" class="text-white-50 text-decoration-none small hover-text-white">Accessibility</a>
+<a href="#" class="text-white-50 text-decoration-none small hover-text-white transition-all">Privacy Policy</a>
+<a href="#" class="text-white-50 text-decoration-none small hover-text-white transition-all">Terms of Service</a>
+<a href="#" class="text-white-50 text-decoration-none small hover-text-white transition-all">Accessibility</a>
+<a href="{{ url_for('chatbot.help_page') }}" class="text-white-50 text-decoration-none small hover-text-white transition-all">
+    <i class="fas fa-headset me-1"></i>Support
+</a>
 </div>
 </div>
 </div>
@@ -337,18 +393,28 @@
 </div>
 <nav class="flex-grow-1 d-flex flex-column gap-3">
     {% if session.get('student_id') %}
-        <a href="{{ url_for('student.student_dashboard') }}" class="text-decoration-none fw-bold py-2 border-bottom" style="color: #0d2453;">Student Dashboard</a>
+        <a href="{{ url_for('student.student_dashboard') }}" class="text-decoration-none fw-bold py-2 border-bottom" style="color: #0d2453;">
+            <i class="fas fa-tachometer-alt me-2"></i>Student Dashboard
+        </a>
     {% endif %}
     {% if session.get('admin_id') %}
-        <a href="{{ url_for('admin.dashboard') }}" class="text-decoration-none fw-bold py-2 border-bottom" style="color: #0d2453;">Admin Dashboard</a>
+        <a href="{{ url_for('admin.dashboard') }}" class="text-decoration-none fw-bold py-2 border-bottom" style="color: #0d2453;">
+            <i class="fas fa-shield-alt me-2"></i>Admin Dashboard
+        </a>
     {% endif %}
-    <a href="{{ url_for('chatbot.help_page') }}" class="text-decoration-none fw-bold py-2 border-bottom" style="color: #64748b;">Help & Support</a>
+    <a href="{{ url_for('chatbot.help_page') }}" class="text-decoration-none fw-bold py-2 border-bottom" style="color: #64748b;">
+        <i class="fas fa-headset me-2"></i>Help & Support
+    </a>
 </nav>
 <div class="mt-auto pt-3">
     {% if not session.get('student_id') and not session.get('admin_id') %}
-        <a href="{{ url_for('student.student_login') }}" class="btn w-100 py-2 text-white" style="background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%);">Student Login</a>
+        <a href="{{ url_for('student.student_login') }}" class="btn w-100 py-2 text-white" style="background: linear-gradient(135deg, #0d2453 0%, #1a237e 100%);">
+            <i class="fas fa-sign-in-alt me-2"></i>Student Login
+        </a>
     {% else %}
-        <a href="{{ url_for('student.student_logout') if session.get('student_id') else url_for('admin.admin_logout') }}" class="btn btn-danger w-100 py-2">Logout</a>
+        <a href="{{ url_for('student.student_logout') if session.get('student_id') else url_for('admin.admin_logout') }}" class="btn btn-danger w-100 py-2">
+            <i class="fas fa-sign-out-alt me-2"></i>Logout
+        </a>
     {% endif %}
 </div>
 </aside>
@@ -399,8 +465,15 @@
 
 <style>
     /* Utility classes */
+    .hover-text-white {
+        transition: color 0.2s ease;
+    }
     .hover-text-white:hover {
         color: white !important;
+    }
+    
+    .transition-all {
+        transition: all 0.3s ease;
     }
     
     /* Ensure Bootstrap compatibility */
@@ -429,7 +502,132 @@
     .btn-cu-primary:hover {
         background: linear-gradient(135deg, #1a237e 0%, #0d2453 100%);
     }
+    
+    /* Focus styles for better accessibility */
+    a:focus, button:focus, input:focus, select:focus, textarea:focus {
+        outline: 2px solid #1a237e;
+        outline-offset: 2px;
+    }
 </style>
+
+<!-- Floating Robot Assistant -->
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        25% { transform: translateY(-8px) rotate(2deg); }
+        75% { transform: translateY(8px) rotate(-2deg); }
+    }
+    
+    @keyframes pulseGlow {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(26, 35, 126, 0.4); }
+        50% { box-shadow: 0 0 0 20px rgba(26, 35, 126, 0); }
+    }
+    
+    @keyframes wave {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-10deg); }
+        75% { transform: rotate(10deg); }
+    }
+
+    .floating-robot-global {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .floating-robot-global:hover {
+        transform: scale(1.05);
+    }
+    
+    .robot-circle-global {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #1a237e 0%, #3f51b5 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 25px rgba(26, 35, 126, 0.3);
+        animation: pulseGlow 2s infinite;
+        position: relative;
+    }
+    
+    .robot-circle-global i {
+        font-size: 2rem;
+        color: white;
+    }
+    
+    .robot-wave-global {
+        position: absolute;
+        top: -10px;
+        right: -8px;
+        background: #4caf50;
+        color: white;
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        animation: wave 1.5s ease-in-out infinite;
+    }
+    
+    .robot-tooltip-global {
+        position: absolute;
+        right: 80px;
+        top: 15px;
+        background: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        white-space: nowrap;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #1a237e;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        opacity: 0;
+        transform: translateX(20px);
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+    
+    .floating-robot-global:hover .robot-tooltip-global {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    @media (max-width: 768px) {
+        .floating-robot-global {
+            bottom: 70px;
+            right: 15px;
+        }
+        .robot-circle-global {
+            width: 55px;
+            height: 55px;
+        }
+        .robot-circle-global i {
+            font-size: 1.5rem;
+        }
+        .robot-tooltip-global {
+            display: none;
+        }
+    }
+</style>
+
+<div class="floating-robot-global" id="globalFloatingRobot" onclick="window.location.href='{{ url_for('chatbot.help_page') }}'">
+    <div class="robot-circle-global">
+        <i class="fas fa-robot"></i>
+        <div class="robot-wave-global">
+            <i class="fas fa-hand-peace fa-xs"></i>
+        </div>
+    </div>
+    <div class="robot-tooltip-global">
+        🤖 Need help? Ask the HelpBot!
+    </div>
+</div>
 
 {% block extra_scripts %}{% endblock %}
 </body>

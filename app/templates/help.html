@@ -1,558 +1,600 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Help Center - Cavendish University</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-blue: #1a237e;
-            --primary-light: #3f51b5;
-            --accent-green: #4caf50;
-            --bg-light: #f8f9fa;
-            --text-dark: #333333;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
+{% block title %}HelpBot - Cavendish University{% endblock %}
 
-        .help-container {
-            max-width: 900px;
-            width: 100%;
-        }
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #1a237e;
+        --primary-light: #3f51b5;
+        --accent-green: #4caf50;
+        --bg-light: #f8f9fa;
+        --text-dark: #333333;
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
 
-        .help-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            border: none;
-        }
+    /* Chatbot specific styles */
+    .chatbot-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
 
+    .help-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        border: none;
+    }
+
+    .help-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .help-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .bot-avatar {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+    }
+
+    .help-body {
+        padding: 1.5rem;
+    }
+
+    .chat-container {
+        background: var(--bg-light);
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+        height: 450px;
+        overflow-y: auto;
+        border: 1px solid #e9ecef;
+    }
+
+    /* Custom scrollbar */
+    .chat-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    .chat-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    .chat-container::-webkit-scrollbar-thumb {
+        background: var(--primary-light);
+        border-radius: 3px;
+    }
+
+    .message {
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .user-message {
+        flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .user-avatar {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
+        color: white;
+    }
+
+    .bot-avatar-small {
+        background: linear-gradient(135deg, var(--accent-green) 0%, #45a049 100%);
+        color: white;
+    }
+
+    .message-content {
+        max-width: 70%;
+        padding: 0.75rem 1rem;
+        border-radius: 18px;
+        position: relative;
+        word-wrap: break-word;
+    }
+
+    .user-message .message-content {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
+        color: white;
+        border-bottom-right-radius: 5px;
+    }
+
+    .bot-message .message-content {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-bottom-left-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .message-time {
+        font-size: 0.7rem;
+        opacity: 0.7;
+        margin-top: 0.25rem;
+    }
+
+    .input-group-custom {
+        background: white;
+        border-radius: 50px;
+        padding: 0.5rem;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .input-group-custom input {
+        flex: 1;
+        border: none;
+        border-radius: 50px;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        outline: none;
+    }
+
+    .input-group-custom input:focus {
+        outline: none;
+    }
+
+    .btn-send {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
+        border: none;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-send:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(63, 81, 181, 0.3);
+    }
+
+    .btn-send:disabled {
+        opacity: 0.6;
+        transform: none;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+
+    .quick-action-btn {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .quick-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-light);
+    }
+
+    .action-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .action-text h6 {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+    }
+
+    .action-text p {
+        margin: 0;
+        font-size: 0.7rem;
+        color: #666;
+    }
+
+    .typing-indicator {
+        display: none;
+        padding: 0.75rem 1rem;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 18px;
+        border-bottom-left-radius: 5px;
+        max-width: 70%;
+        margin-bottom: 1rem;
+    }
+
+    .typing-dots {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+    }
+
+    .typing-dots span {
+        width: 8px;
+        height: 8px;
+        background: #999;
+        border-radius: 50%;
+        animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(1) { animation-delay: 0s; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-5px); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .chatbot-wrapper {
+            padding: 10px;
+        }
+        
         .help-header {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
-            color: white;
-            padding: 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+            padding: 1.25rem;
         }
-
-        .help-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 2;
-        }
-
+        
         .bot-avatar {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .help-body {
-            padding: 2rem;
-        }
-
-        .chat-container {
-            background: var(--bg-light);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            height: 400px;
-            overflow-y: auto;
-            border: 1px solid #e9ecef;
-        }
-
-        .message {
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-        }
-
-        .user-message {
-            flex-direction: row-reverse;
-        }
-
-        .message-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .user-avatar {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
-            color: white;
-        }
-
-        .bot-avatar-small {
-            background: linear-gradient(135deg, var(--accent-green) 0%, #45a049 100%);
-            color: white;
-        }
-
-        .message-content {
-            max-width: 70%;
-            padding: 0.75rem 1rem;
-            border-radius: 18px;
-            position: relative;
-        }
-
-        .user-message .message-content {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
-            color: white;
-            border-bottom-right-radius: 5px;
-        }
-
-        .bot-message .message-content {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-bottom-left-radius: 5px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .message-time {
-            font-size: 0.75rem;
-            opacity: 0.7;
-            margin-top: 0.25rem;
-        }
-
-        .input-group {
-            background: white;
-            border-radius: 50px;
-            padding: 0.5rem;
-            border: 1px solid #e9ecef;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .form-control {
-            border: none;
-            border-radius: 50px;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-        }
-
-        .form-control:focus {
-            box-shadow: none;
-            border: none;
-        }
-
-        .btn-send {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
-            border: none;
-            border-radius: 50%;
             width: 50px;
             height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            transition: all 0.3s ease;
         }
-
-        .btn-send:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(63, 81, 181, 0.3);
+        
+        .bot-avatar i {
+            font-size: 1.5rem;
         }
-
-        .btn-send:disabled {
-            opacity: 0.6;
-            transform: none;
-            box-shadow: none;
+        
+        .help-header h2 {
+            font-size: 1.25rem;
         }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
+        
+        .help-header p {
+            font-size: 0.8rem;
         }
-
-        .quick-action-btn {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
+        
+        .help-body {
             padding: 1rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
         }
-
-        .quick-action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary-light);
+        
+        .chat-container {
+            height: 350px;
+            padding: 1rem;
         }
-
-        .action-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        .action-text {
-            text-align: left;
-            flex: 1;
-        }
-
-        .action-text h6 {
-            margin: 0;
-            color: var(--primary-blue);
-            font-weight: 600;
-        }
-
-        .action-text p {
-            margin: 0.25rem 0 0 0;
+        
+        .message-content {
+            max-width: 85%;
             font-size: 0.85rem;
-            color: #666;
         }
-
-        .typing-indicator {
-            display: none;
-            padding: 0.75rem 1rem;
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 18px;
-            border-bottom-left-radius: 5px;
-            max-width: 70%;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        
+        .message-avatar {
+            width: 30px;
+            height: 30px;
         }
-
-        .typing-dots {
-            display: flex;
-            gap: 4px;
+        
+        .message-avatar i {
+            font-size: 0.8rem;
         }
-
-        .typing-dots span {
-            width: 8px;
-            height: 8px;
-            background: #999;
-            border-radius: 50%;
-            animation: typing 1.4s infinite ease-in-out;
+        
+        .quick-actions {
+            grid-template-columns: 1fr;
         }
-
-        .typing-dots span:nth-child(1) { animation-delay: 0s; }
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
+        
+        .input-group-custom input {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
         }
-
-        /* Scrollbar styling */
-        .chat-container::-webkit-scrollbar {
-            width: 6px;
+        
+        .btn-send {
+            width: 42px;
+            height: 42px;
         }
+    }
 
-        .chat-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
+    @media (max-width: 480px) {
+        .chat-container {
+            height: 300px;
         }
-
-        .chat-container::-webkit-scrollbar-thumb {
-            background: var(--primary-light);
-            border-radius: 3px;
+        
+        .message-content {
+            max-width: 90%;
         }
-
-        .chat-container::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-blue);
+        
+        .action-text h6 {
+            font-size: 0.75rem;
         }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            .help-header {
-                padding: 1.5rem;
-            }
-
-            .help-body {
-                padding: 1.5rem;
-            }
-
-            .message-content {
-                max-width: 85%;
-            }
-
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
+        
+        .action-text p {
+            font-size: 0.65rem;
         }
+    }
+</style>
 
-        @media (max-width: 480px) {
-            .message-content {
-                max-width: 90%;
-            }
+<div class="chatbot-wrapper">
+    <div class="help-card">
+        <!-- Header -->
+        <div class="help-header">
+            <div class="header-content">
+                <div class="bot-avatar">
+                    <i class="fas fa-robot fa-2x"></i>
+                </div>
+                <h2 class="mb-2 fs-4">Cavendish HelpBot</h2>
+                <p class="mb-0 opacity-75 small">Your 24/7 assistant for university support</p>
+            </div>
+        </div>
 
-            .input-group {
-                flex-direction: column;
-                gap: 0.5rem;
-                border-radius: 15px;
-            }
-
-            .form-control {
-                border-radius: 15px;
-            }
-
-            .btn-send {
-                width: 100%;
-                border-radius: 15px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="help-container">
-        <div class="help-card">
-            <!-- Header -->
-            <div class="help-header">
-                <div class="header-content">
-                    <div class="bot-avatar">
-                        <i class="fas fa-robot fa-2x"></i>
+        <!-- Body -->
+        <div class="help-body">
+            <!-- Chat Container -->
+            <div class="chat-container" id="chatBox">
+                <!-- Welcome Message -->
+                <div class="message bot-message">
+                    <div class="message-avatar bot-avatar-small">
+                        <i class="fas fa-robot fa-sm"></i>
                     </div>
-                    <h2 class="mb-2">Cavendish HelpBot</h2>
-                    <p class="mb-0 opacity-75">Your 24/7 assistant for university support</p>
+                    <div class="message-content">
+                        <p class="mb-1 small">Hello! I'm your Cavendish University HelpBot. I'm here to assist you with:</p>
+                        <ul class="mb-1 small ps-3">
+                            <li>Registration and enrollment questions</li>
+                            <li>Payment and fee inquiries</li>
+                            <li>Academic program information</li>
+                            <li>Technical support issues</li>
+                            <li>General university information</li>
+                        </ul>
+                        <p class="mb-0 small">How can I help you today?</p>
+                        <div class="message-time">Just now</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Body -->
-            <div class="help-body">
-                <!-- Chat Container -->
-                <div class="chat-container" id="chatBox">
-                    <!-- Welcome Message -->
-                    <div class="message bot-message">
-                        <div class="message-avatar bot-avatar-small">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <div class="message-content">
-                            <p class="mb-1">Hello! I'm your Cavendish University HelpBot. I'm here to assist you with:</p>
-                            <ul class="mb-1">
-                                <li>Registration and enrollment questions</li>
-                                <li>Payment and fee inquiries</li>
-                                <li>Academic program information</li>
-                                <li>Technical support issues</li>
-                                <li>General university information</li>
-                            </ul>
-                            <p class="mb-0">How can I help you today?</p>
-                            <div class="message-time">Just now</div>
-                        </div>
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span class="ms-2 small text-muted">Bot is thinking...</span>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-group-custom">
+                <input type="text" id="userInput" 
+                       placeholder="Type your question here..." 
+                       aria-label="Type your message">
+                <button class="btn-send" id="sendButton">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action-btn" onclick="askQuickQuestion('How do I reset my password?')">
+                    <div class="action-icon">
+                        <i class="fas fa-key fa-sm"></i>
+                    </div>
+                    <div class="action-text">
+                        <h6>Password Reset</h6>
+                        <p>Help with account access</p>
                     </div>
                 </div>
-
-                <!-- Typing Indicator -->
-                <div class="typing-indicator" id="typingIndicator">
-                    <div class="typing-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                <div class="quick-action-btn" onclick="askQuickQuestion('What are the payment methods available?')">
+                    <div class="action-icon">
+                        <i class="fas fa-credit-card fa-sm"></i>
+                    </div>
+                    <div class="action-text">
+                        <h6>Payment Methods</h6>
+                        <p>Fee payment information</p>
                     </div>
                 </div>
-
-                <!-- Input Area -->
-                <div class="input-group">
-                    <input type="text" class="form-control" id="userInput" 
-                           placeholder="Type your question here..." 
-                           aria-label="Type your message">
-                    <button class="btn-send" id="sendButton" onclick="sendMessage()">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                <div class="quick-action-btn" onclick="askQuickQuestion('How do I contact the administration office?')">
+                    <div class="action-icon">
+                        <i class="fas fa-phone fa-sm"></i>
+                    </div>
+                    <div class="action-text">
+                        <h6>Contact Support</h6>
+                        <p>Get in touch with us</p>
+                    </div>
                 </div>
-
-                <!-- Enter key support -->
-                <script>
-                    document.getElementById('userInput').addEventListener('keypress', function(e) {
-                        if (e.key === 'Enter') {
-                            sendMessage();
-                        }
-                    });
-                </script>
-
-                <!-- Quick Actions -->
-                <div class="quick-actions">
-                    <div class="quick-action-btn" onclick="askQuickQuestion('How do I reset my password?')">
-                        <div class="action-icon">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <div class="action-text">
-                            <h6>Password Reset</h6>
-                            <p>Help with account access issues</p>
-                        </div>
+                <div class="quick-action-btn" onclick="askQuickQuestion('What documents are needed for registration?')">
+                    <div class="action-icon">
+                        <i class="fas fa-file-alt fa-sm"></i>
                     </div>
-                    <div class="quick-action-btn" onclick="askQuickQuestion('What are the payment methods available?')">
-                        <div class="action-icon">
-                            <i class="fas fa-credit-card"></i>
-                        </div>
-                        <div class="action-text">
-                            <h6>Payment Methods</h6>
-                            <p>Information about fee payments</p>
-                        </div>
-                    </div>
-                    <div class="quick-action-btn" onclick="askQuickQuestion('How do I contact the administration office?')">
-                        <div class="action-icon">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div class="action-text">
-                            <h6>Contact Support</h6>
-                            <p>Get in touch with our team</p>
-                        </div>
-                    </div>
-                    <div class="quick-action-btn" onclick="askQuickQuestion('What documents are needed for registration?')">
-                        <div class="action-icon">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <div class="action-text">
-                            <h6>Registration Help</h6>
-                            <p>Required documents and process</p>
-                        </div>
+                    <div class="action-text">
+                        <h6>Registration Help</h6>
+                        <p>Required documents</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        function formatTime() {
-            const now = new Date();
-            return now.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: true 
+<script>
+    // Format time for messages
+    function formatTime() {
+        const now = new Date();
+        return now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: true 
+        });
+    }
+
+    // Add message to chat
+    function addMessage(message, isUser = false) {
+        const chatBox = document.getElementById('chatBox');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+        
+        const avatarClass = isUser ? 'user-avatar' : 'bot-avatar-small';
+        const avatarIcon = isUser ? 'fas fa-user' : 'fas fa-robot';
+        
+        messageDiv.innerHTML = `
+            <div class="message-avatar ${avatarClass}">
+                <i class="${avatarIcon} fa-sm"></i>
+            </div>
+            <div class="message-content">
+                <p class="mb-1 small">${escapeHtml(message)}</p>
+                <div class="message-time">${formatTime()}</div>
+            </div>
+        `;
+        
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Show typing indicator
+    function showTypingIndicator() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        typingIndicator.style.display = 'flex';
+        const chatBox = document.getElementById('chatBox');
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Hide typing indicator
+    function hideTypingIndicator() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        typingIndicator.style.display = 'none';
+    }
+
+    // Quick question handler
+    function askQuickQuestion(question) {
+        document.getElementById('userInput').value = question;
+        sendMessage();
+    }
+
+    // Send message to backend
+    async function sendMessage() {
+        const input = document.getElementById('userInput');
+        const message = input.value.trim();
+        const sendButton = document.getElementById('sendButton');
+        
+        if (!message) return;
+
+        sendButton.disabled = true;
+        input.disabled = true;
+
+        addMessage(message, true);
+        input.value = '';
+        showTypingIndicator();
+
+        try {
+            const response = await fetch('/chatbot/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
             });
-        }
 
-        function addMessage(message, isUser = false) {
-            const chatBox = document.getElementById('chatBox');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            hideTypingIndicator();
             
-            const avatarClass = isUser ? 'user-avatar' : 'bot-avatar-small';
-            const avatarIcon = isUser ? 'fas fa-user' : 'fas fa-robot';
-            
-            messageDiv.innerHTML = `
-                <div class="message-avatar ${avatarClass}">
-                    <i class="${avatarIcon}"></i>
-                </div>
-                <div class="message-content">
-                    <p class="mb-1">${message}</p>
-                    <div class="message-time">${formatTime()}</div>
-                </div>
-            `;
-            
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+            if (data.response) {
+                addMessage(data.response, false);
+            } else if (data.error) {
+                addMessage("I'm sorry, I encountered an issue. Please try again or contact support.", false);
+            }
 
-        function showTypingIndicator() {
-            const typingIndicator = document.getElementById('typingIndicator');
-            typingIndicator.style.display = 'block';
-            document.getElementById('chatBox').appendChild(typingIndicator);
-            document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+        } catch (error) {
+            console.error('Error:', error);
+            hideTypingIndicator();
+            addMessage("I'm sorry, I'm having trouble connecting right now. Please try again in a moment or contact the administration office directly.", false);
+        } finally {
+            sendButton.disabled = false;
+            input.disabled = false;
+            input.focus();
         }
+    }
 
-        function hideTypingIndicator() {
-            const typingIndicator = document.getElementById('typingIndicator');
-            typingIndicator.style.display = 'none';
-        }
-
-        function askQuickQuestion(question) {
-            document.getElementById('userInput').value = question;
+    // Event listeners
+    document.getElementById('userInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
             sendMessage();
         }
+    });
+    
+    document.getElementById('sendButton').addEventListener('click', sendMessage);
 
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const message = input.value.trim();
-            const sendButton = document.getElementById('sendButton');
-            
-            if (!message) return;
-
-            // Disable button and input during processing
-            sendButton.disabled = true;
-            input.disabled = true;
-
-            // Add user message
-            addMessage(message, true);
-            input.value = '';
-
-            // Show typing indicator
-            showTypingIndicator();
-
-            try {
-                const res = await fetch('/chatbot/ask', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({message})
-                });
-
-                if (!res.ok) {
-                    throw new Error('Network response was not ok');
-                }
-
-                const data = await res.json();
-                
-                // Hide typing indicator
-                hideTypingIndicator();
-                
-                // Add bot response
-                addMessage(data.response, false);
-
-            } catch (error) {
-                console.error('Error:', error);
-                hideTypingIndicator();
-                addMessage("I'm sorry, I'm having trouble connecting right now. Please try again in a moment or contact the administration office directly.", false);
-            } finally {
-                // Re-enable button and input
-                sendButton.disabled = false;
-                input.disabled = false;
-                input.focus();
-            }
-        }
-
-        // Focus on input when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('userInput').focus();
-        });
-    </script>
-</body>
-</html>
+    // Focus on input when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('userInput').focus();
+        
+        // Scroll to bottom of chat
+        const chatBox = document.getElementById('chatBox');
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+</script>
+{% endblock %}

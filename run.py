@@ -1,14 +1,18 @@
-# run.py
 from app import create_app
-from app.extensions import db  # use extensions for consistent initialization
+from app.extensions import db, mail  # use extensions for consistent initialization
 
 app = create_app()
+
+# Initialize Mail with the app
+mail.init_app(app)
+
 
 def create_db():
     """Create all database tables if they do not exist."""
     with app.app_context():
         db.create_all()
         print("✅ Database tables created successfully!")
+
 
 if __name__ == "__main__":
     # Ensure DB tables are created before running the server

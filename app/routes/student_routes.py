@@ -17,6 +17,7 @@ from reportlab.lib.units import inch
 from app.models import db, Student, Payment, User, RegistrationSlip
 from app.models_academics import ProgramStructure, Program, ProgramCourse, StudentRegistration, RegisteredCourse, Course
 from app.utils.helpers import allowed_file
+from app.utils.email import send_registration_email
 
 # Blueprint definition
 student_bp = Blueprint('student', __name__)
@@ -36,34 +37,59 @@ def student_required(f):
 @student_bp.route('/login', methods=['GET', 'POST'])
 def student_login():
     if request.method == 'POST':
-        student_number = request.form.get('student_number')
+        login_identifier = request.form.get('student_number')  # This can be either student number OR email
         password = request.form.get('password')
 
-        user = User.query.filter_by(
-            username=student_number,
-            role='student'
-        ).first()
+        # Check if login_identifier is email or student number
+        is_email = '@' in login_identifier and '.' in login_identifier
+        
+        if is_email:
+            # Find user by email
+            user = User.query.filter_by(
+                email=login_identifier,
+                role='student'
+            ).first()
+            
+            if not user:
+                # Also check if email exists in Student table directly
+                student = Student.query.filter_by(email=login_identifier).first()
+                if student:
+                    user = User.query.filter_by(
+                        student_id=student.id,
+                        role='student'
+                    ).first()
+        else:
+            # Find user by student number (username)
+            user = User.query.filter_by(
+                username=login_identifier,
+                role='student'
+            ).first()
 
         if not user:
-            flash("Account not found", "danger")
+            flash("Account not found. Please check your Student ID or Email.", "danger")
             return render_template('student/login.html')
 
         if not user.check_password(password):
-            flash("Wrong password", "danger")
+            flash("Wrong password. Please try again.", "danger")
             return render_template('student/login.html')
 
-        # 🔥 IMPORTANT: verify student exists
+        # Verify student exists
         student = Student.query.get(user.student_id)
         if not student:
-            flash("Student profile missing. Contact admin.", "danger")
+            flash("Student profile missing. Please contact administration.", "danger")
             return render_template('student/login.html')
 
+        # Store student info in session
         session['student_id'] = student.id
-        flash("Login successful!", "success")
+        session['student_name'] = student.name
+        session['student_number'] = student.student_number
+        
+        flash(f"Welcome back, {student.name}!", "success")
         return redirect(url_for('student.student_dashboard'))
 
     return render_template('student/login.html')
 
+#---------------- Logout ----------------
 @student_bp.route('/logout')
 def student_logout():
     session.pop('student_id', None)
@@ -812,10 +838,12 @@ def student_register():
     if request.method == 'POST':
         student_number = request.form.get('student_number')
         name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
 
-        if not all([student_number, name, password, confirm_password]):
+        if not all([student_number, name, email, password, confirm_password]):
             flash("All fields are required.", "danger")
             return redirect(url_for('student.student_register'))
 
@@ -823,28 +851,49 @@ def student_register():
             flash("Passwords do not match.", "danger")
             return redirect(url_for('student.student_register'))
 
-        student = Student.query.filter_by(student_number=student_number).first()
-        if not student:
-            student = Student(student_number=student_number, name=name)
-            db.session.add(student)
-            db.session.commit()
+        # Check if email already exists
+        existing_email = Student.query.filter_by(email=email).first()
+        if existing_email:
+            flash("Email address already registered.", "danger")
+            return redirect(url_for('student.student_register'))
 
-        user = User.query.filter_by(student_id=student.id, role='student').first()
-        if user:
+        # Check if student number already has a user account
+        existing_user = User.query.filter_by(username=student_number, role='student').first()
+        if existing_user:
             flash("This student ID is already registered.", "danger")
             return redirect(url_for('student.student_register'))
 
+        # Find or create student
+        student = Student.query.filter_by(student_number=student_number).first()
+        if not student:
+            student = Student(
+                student_number=student_number,
+                name=name,
+                email=email,
+                phone=phone
+            )
+            db.session.add(student)
+            db.session.commit()
+
+        # Create user account
         user = User(
             username=student_number,
-            email=f"{student_number}@cavendish.ac.zm",
-            role="student",
+            email=email,
+            role='student',
             student_id=student.id
         )
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
 
-        flash("✅ Registration successful! You can now log in.", "success")
+        # Try to send email - don't fail if it doesn't work
+        email_sent = send_registration_email(student)
+        
+        if email_sent:
+            flash("✅ Registration successful! Please check your email for confirmation.", "success")
+        else:
+            flash("✅ Registration successful! (Email could not be sent. You can still log in.)", "success")
+
         return redirect(url_for('student.student_login'))
 
     return render_template('student/register.html')

@@ -7,6 +7,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..300,0..1&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -161,9 +162,130 @@
             width: auto;
             opacity: 0.7;
         }
+        
+        /* Floating Robot Styles */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(2deg); }
+            75% { transform: translateY(8px) rotate(-2deg); }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(26, 35, 126, 0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(26, 35, 126, 0); }
+        }
+        
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        .floating-robot-global {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 10000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .floating-robot-global:hover {
+            transform: scale(1.05);
+        }
+        
+        .robot-circle-global {
+            width: 75px;
+            height: 75px;
+            background: linear-gradient(135deg, #1a237e 0%, #3f51b5 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(26, 35, 126, 0.5);
+            animation: pulseGlow 2s infinite;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .robot-circle-global i {
+            font-size: 2.2rem;
+            color: white;
+        }
+        
+        .robot-wave-global {
+            position: absolute;
+            top: -10px;
+            right: -8px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            animation: wave 1.5s ease-in-out infinite;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .robot-tooltip-global {
+            position: absolute;
+            right: 85px;
+            top: 18px;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            white-space: nowrap;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1a237e;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .robot-tooltip-global i {
+            margin-right: 6px;
+            color: #4caf50;
+        }
+        
+        .floating-robot-global:hover .robot-tooltip-global {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        @media (max-width: 768px) {
+            .floating-robot-global {
+                bottom: 70px;
+                right: 15px;
+            }
+            .robot-circle-global {
+                width: 60px;
+                height: 60px;
+            }
+            .robot-circle-global i {
+                font-size: 1.8rem;
+            }
+            .robot-tooltip-global {
+                display: none;
+            }
+            .robot-wave-global {
+                width: 22px;
+                height: 22px;
+                font-size: 0.6rem;
+                top: -5px;
+                right: -5px;
+            }
+        }
     </style>
 </head>
 <body class="bg-background text-on-surface">
+
 <!-- Top Navigation Bar -->
 <header class="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-md border-b border-outline-variant/30">
 <div class="flex items-center justify-between px-md py-3 max-w-container-max mx-auto">
@@ -388,7 +510,21 @@ registrar@cavendish.edu
 </div>
 </footer>
 
+<!-- Floating Robot Assistant - Clean version without dot or status text -->
+<div class="floating-robot-global" id="globalFloatingRobot">
+    <div class="robot-circle-global">
+        <i class="fas fa-robot"></i>
+        <div class="robot-wave-global">
+            <i class="fas fa-hand-peace fa-xs"></i>
+        </div>
+    </div>
+    <div class="robot-tooltip-global">
+        <i class="fas fa-comment-dots"></i> Need help? Ask the HelpBot!
+    </div>
+</div>
+
 <script>
+    // Mobile drawer controls
     const menuBtn = document.getElementById('mobile-menu-trigger');
     const drawer = document.getElementById('mobile-drawer');
     const closeBtn = document.getElementById('close-drawer');
@@ -420,6 +556,16 @@ registrar@cavendish.edu
             heroContent.style.opacity = 1 - (scrolled / 500);
         }
     });
+
+    // Floating Robot click handler - navigate to chatbot
+    const floatingRobot = document.getElementById('globalFloatingRobot');
+    if (floatingRobot) {
+        floatingRobot.addEventListener('click', function(e) {
+            e.stopPropagation();
+            window.location.href = "{{ url_for('chatbot.help_page') }}";
+        });
+    }
 </script>
+
 </body>
 </html>
