@@ -91,7 +91,7 @@
     </div>
 
     <!-- ========================= -->
-    <!-- ADD COURSE CARD (Modern) -->
+    <!-- ADD COURSE CARD -->
     <!-- ========================= -->
     <div class="card border-0 shadow-lg rounded-4 mb-4 overflow-hidden">
         <div class="card-header" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; border: none;">
@@ -138,10 +138,10 @@
                             <i class="fas fa-layer-group me-1"></i>Semester Type
                         </label>
                         <select name="semester_type" class="form-select form-select-lg rounded-3" required>
-                            <option value="SEM1" data-icon="fa-book-open">Semester 1 (Core)</option>
-                            <option value="SEM2" data-icon="fa-book">Semester 2 (Core)</option>
-                            <option value="SUMMER" data-icon="fa-sun">Summer Semester</option>
-                            <option value="INDUSTRIAL" data-icon="fa-briefcase">Industrial Attachment</option>
+                            <option value="SEM1">📘 Semester 1 (Core)</option>
+                            <option value="SEM2">📗 Semester 2 (Core)</option>
+                            <option value="SUMMER">☀️ Summer Semester</option>
+                            <option value="INDUSTRIAL">💼 Industrial Attachment</option>
                         </select>
                     </div>
                     <div class="col-md-1">
@@ -155,239 +155,257 @@
     </div>
 
     <!-- ========================= -->
-    <!-- CURRICULUM STRUCTURE (Accordion Style) -->
+    <!-- CURRICULUM STRUCTURE -->
     <!-- ========================= -->
-    <div class="accordion" id="curriculumAccordion">
+    {% if program.duration_years > 0 %}
         {% for year in range(1, program.duration_years + 1) %}
-        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
-            <h2 class="accordion-header" id="headingYear{{ year }}">
-                <button class="accordion-button {% if year != 1 %}collapsed{% endif %} p-4" type="button" 
-                        data-bs-toggle="collapse" data-bs-target="#collapseYear{{ year }}" 
-                        style="background: linear-gradient(135deg, #f8f9fa, #ffffff);">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
-                             style="width: 48px; height: 48px;">
-                            <i class="fas fa-graduation-cap fa-lg"></i>
-                        </div>
-                        <div>
-                            <h4 class="mb-0 fw-bold text-primary">Year {{ year }}</h4>
-                            <p class="text-muted mb-0 small">
-                                {% set year_courses = curriculum|selectattr("year_level", "equalto", year)|list %}
-                                {{ year_courses|length }} courses • 
-                                {{ year_courses|selectattr("semester_type", "equalto", "SEM1")|list|length }} in Sem 1 • 
-                                {{ year_courses|selectattr("semester_type", "equalto", "SEM2")|list|length }} in Sem 2
-                            </p>
-                        </div>
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+            <div class="card-header bg-gradient-primary text-white py-3" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center" 
+                         style="width: 48px; height: 48px;">
+                        <i class="fas fa-graduation-cap fa-lg"></i>
                     </div>
-                </button>
-            </h2>
-            <div id="collapseYear{{ year }}" class="accordion-collapse collapse {% if year == 1 %}show{% endif %}" 
-                 data-bs-parent="#curriculumAccordion">
-                <div class="accordion-body p-4">
-                    
-                    <!-- Semester 1 -->
-                    <div class="mb-4">
-                        <div class="d-flex align-items-center gap-2 mb-3">
+                    <div>
+                        <h4 class="mb-0 fw-bold">Year {{ year }}</h4>
+                        <p class="mb-0 small opacity-75">
+                            {% set year_courses = curriculum|selectattr("year_level", "equalto", year)|list %}
+                            {{ year_courses|length }} courses total
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <!-- Semester 1 -->
+                <div class="semester-section mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
                             <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
-                                 style="width: 32px; height: 32px;">
+                                 style="width: 36px; height: 36px;">
                                 <i class="fas fa-book fa-sm"></i>
                             </div>
-                            <h5 class="mb-0 text-primary fw-semibold">Semester 1</h5>
-                            <span class="badge bg-primary rounded-pill">
-                                {{ curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SEM1")|list|length }} Courses
-                            </span>
+                            <h5 class="mb-0 text-primary fw-bold">Semester 1</h5>
                         </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 20%">Course Code</th>
-                                        <th style="width: 55%">Course Title</th>
-                                        <th style="width: 10%">Credits</th>
-                                        <th style="width: 15%">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% set sem1_courses = curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SEM1")|list %}
+                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                            <i class="fas fa-list me-1"></i>
+                            {{ curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SEM1")|list|length }} Courses
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 25%">Course Code</th>
+                                    <th style="width: 55%">Course Title</th>
+                                    <th style="width: 10%">Credits</th>
+                                    <th style="width: 10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set sem1_courses = curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SEM1")|list %}
+                                {% if sem1_courses %}
                                     {% for pc in sem1_courses %}
                                     <tr>
-                                        <td><code class="fw-bold text-primary">{{ pc.course.code }}</code></td>
-                                        <td>{{ pc.course.title }}</td>
-                                        <td><span class="badge bg-secondary rounded-pill">{{ pc.course.credits }} credits</span></td>
+                                        <td><code class="fw-bold text-primary bg-light px-2 py-1 rounded">{{ pc.course.code if pc.course else 'N/A' }}</code></td>
+                                        <td>{{ pc.course.title if pc.course else 'Course not found' }}</td>
+                                        <td><span class="badge bg-secondary rounded-pill">{{ pc.course.credits if pc.course else 0 }} credits</span></td>
                                         <td>
                                             <a href="{{ url_for('admin.remove_program_course', id=pc.id) }}" 
                                                class="btn btn-sm btn-outline-danger rounded-pill px-3"
-                                               onclick="return confirm('Remove {{ pc.course.code }} from curriculum?')">
+                                               onclick="return confirm('Remove {{ pc.course.code if pc.course else 'this course' }} from curriculum?')">
                                                 <i class="fas fa-trash-alt me-1"></i>Remove
                                             </a>
                                         </td>
                                     </tr>
-                                    {% else %}
+                                    {% endfor %}
+                                {% else %}
                                     <tr>
                                         <td colspan="4" class="text-center text-muted py-4">
                                             <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
                                             No courses added to Semester 1 yet
                                         </td>
                                     </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                                {% endif %}
+                            </tbody>
+                        </table>
                     </div>
+                </div>
 
-                    <!-- Semester 2 -->
-                    <div class="mb-4">
-                        <div class="d-flex align-items-center gap-2 mb-3">
+                <!-- Semester 2 -->
+                <div class="semester-section mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
                             <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" 
-                                 style="width: 32px; height: 32px;">
+                                 style="width: 36px; height: 36px;">
                                 <i class="fas fa-book fa-sm"></i>
                             </div>
-                            <h5 class="mb-0 text-success fw-semibold">Semester 2</h5>
-                            <span class="badge bg-success rounded-pill">
-                                {{ curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SEM2")|list|length }} Courses
-                            </span>
+                            <h5 class="mb-0 text-success fw-bold">Semester 2</h5>
                         </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 20%">Course Code</th>
-                                        <th style="width: 55%">Course Title</th>
-                                        <th style="width: 10%">Credits</th>
-                                        <th style="width: 15%">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% set sem2_courses = curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SEM2")|list %}
+                        <span class="badge bg-success rounded-pill px-3 py-2">
+                            <i class="fas fa-list me-1"></i>
+                            {{ curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SEM2")|list|length }} Courses
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 25%">Course Code</th>
+                                    <th style="width: 55%">Course Title</th>
+                                    <th style="width: 10%">Credits</th>
+                                    <th style="width: 10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set sem2_courses = curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SEM2")|list %}
+                                {% if sem2_courses %}
                                     {% for pc in sem2_courses %}
                                     <tr>
-                                        <td><code class="fw-bold text-primary">{{ pc.course.code }}</code></td>
-                                        <td>{{ pc.course.title }}</td>
-                                        <td><span class="badge bg-secondary rounded-pill">{{ pc.course.credits }} credits</span></td>
+                                        <td><code class="fw-bold text-primary bg-light px-2 py-1 rounded">{{ pc.course.code if pc.course else 'N/A' }}</code></td>
+                                        <td>{{ pc.course.title if pc.course else 'Course not found' }}</td>
+                                        <td><span class="badge bg-secondary rounded-pill">{{ pc.course.credits if pc.course else 0 }} credits</span></td>
                                         <td>
                                             <a href="{{ url_for('admin.remove_program_course', id=pc.id) }}" 
                                                class="btn btn-sm btn-outline-danger rounded-pill px-3"
-                                               onclick="return confirm('Remove {{ pc.course.code }} from curriculum?')">
+                                               onclick="return confirm('Remove {{ pc.course.code if pc.course else 'this course' }} from curriculum?')">
                                                 <i class="fas fa-trash-alt me-1"></i>Remove
                                             </a>
                                         </td>
                                     </tr>
-                                    {% else %}
+                                    {% endfor %}
+                                {% else %}
                                     <tr>
                                         <td colspan="4" class="text-center text-muted py-4">
                                             <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
                                             No courses added to Semester 2 yet
                                         </td>
                                     </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                                {% endif %}
+                            </tbody>
+                        </table>
                     </div>
+                </div>
 
-                    <!-- Summer Semester (Optional) -->
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center gap-2 mb-3">
+                <!-- Summer Semester (Optional) -->
+                <div class="semester-section mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
                             <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center" 
-                                 style="width: 32px; height: 32px;">
+                                 style="width: 36px; height: 36px;">
                                 <i class="fas fa-sun fa-sm"></i>
                             </div>
-                            <h5 class="mb-0 text-warning fw-semibold">Summer Semester</h5>
-                            <span class="badge bg-warning rounded-pill">
-                                {{ curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SUMMER")|list|length }} Courses
-                            </span>
+                            <h5 class="mb-0 text-warning fw-bold">Summer Semester</h5>
                         </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 20%">Course Code</th>
-                                        <th style="width: 55%">Course Title</th>
-                                        <th style="width: 10%">Credits</th>
-                                        <th style="width: 15%">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% set summer_courses = curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SUMMER")|list %}
+                        <span class="badge bg-warning rounded-pill px-3 py-2">
+                            <i class="fas fa-list me-1"></i>
+                            {{ curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SUMMER")|list|length }} Courses
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 25%">Course Code</th>
+                                    <th style="width: 55%">Course Title</th>
+                                    <th style="width: 10%">Credits</th>
+                                    <th style="width: 10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set summer_courses = curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "SUMMER")|list %}
+                                {% if summer_courses %}
                                     {% for pc in summer_courses %}
                                     <tr>
-                                        <td><code class="fw-bold text-primary">{{ pc.course.code }}</code></td>
-                                        <td>{{ pc.course.title }}</td>
-                                        <td><span class="badge bg-secondary rounded-pill">{{ pc.course.credits }} credits</span></td>
+                                        <td><code class="fw-bold text-primary bg-light px-2 py-1 rounded">{{ pc.course.code if pc.course else 'N/A' }}</code></td>
+                                        <td>{{ pc.course.title if pc.course else 'Course not found' }}</td>
+                                        <td><span class="badge bg-secondary rounded-pill">{{ pc.course.credits if pc.course else 0 }} credits</span></td>
                                         <td>
                                             <a href="{{ url_for('admin.remove_program_course', id=pc.id) }}" 
                                                class="btn btn-sm btn-outline-danger rounded-pill px-3"
-                                               onclick="return confirm('Remove {{ pc.course.code }} from curriculum?')">
+                                               onclick="return confirm('Remove {{ pc.course.code if pc.course else 'this course' }} from curriculum?')">
                                                 <i class="fas fa-trash-alt me-1"></i>Remove
                                             </a>
                                         </td>
                                     </tr>
-                                    {% else %}
+                                    {% endfor %}
+                                {% else %}
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted py-3">
-                                            <i class="fas fa-plus-circle me-1"></i>No summer courses added
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            <i class="fas fa-sun me-1"></i> No summer courses added
                                         </td>
                                     </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                                {% endif %}
+                            </tbody>
+                        </table>
                     </div>
+                </div>
 
-                    <!-- Industrial Attachment (Optional) -->
-                    <div>
-                        <div class="d-flex align-items-center gap-2 mb-3">
+                <!-- Industrial Attachment (Optional) -->
+                <div class="semester-section">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
                             <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" 
-                                 style="width: 32px; height: 32px;">
+                                 style="width: 36px; height: 36px;">
                                 <i class="fas fa-briefcase fa-sm"></i>
                             </div>
-                            <h5 class="mb-0 text-danger fw-semibold">Industrial Attachment</h5>
-                            <span class="badge bg-danger rounded-pill">
-                                {{ curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "INDUSTRIAL")|list|length }} Courses
-                            </span>
+                            <h5 class="mb-0 text-danger fw-bold">Industrial Attachment</h5>
                         </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 20%">Course Code</th>
-                                        <th style="width: 55%">Course Title</th>
-                                        <th style="width: 10%">Credits</th>
-                                        <th style="width: 15%">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% set industrial_courses = curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "INDUSTRIAL")|list %}
+                        <span class="badge bg-danger rounded-pill px-3 py-2">
+                            <i class="fas fa-list me-1"></i>
+                            {{ curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "INDUSTRIAL")|list|length }} Courses
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 25%">Course Code</th>
+                                    <th style="width: 55%">Course Title</th>
+                                    <th style="width: 10%">Credits</th>
+                                    <th style="width: 10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set industrial_courses = curriculum|selectattr("year_level", "equalto", year)|selectattr("semester_type", "equalto", "INDUSTRIAL")|list %}
+                                {% if industrial_courses %}
                                     {% for pc in industrial_courses %}
                                     <tr>
-                                        <td><code class="fw-bold text-primary">{{ pc.course.code }}</code></td>
-                                        <td>{{ pc.course.title }}</td>
-                                        <td><span class="badge bg-secondary rounded-pill">{{ pc.course.credits }} credits</span></td>
+                                        <td><code class="fw-bold text-primary bg-light px-2 py-1 rounded">{{ pc.course.code if pc.course else 'N/A' }}</code></td>
+                                        <td>{{ pc.course.title if pc.course else 'Course not found' }}</td>
+                                        <td><span class="badge bg-secondary rounded-pill">{{ pc.course.credits if pc.course else 0 }} credits</span></td>
                                         <td>
                                             <a href="{{ url_for('admin.remove_program_course', id=pc.id) }}" 
                                                class="btn btn-sm btn-outline-danger rounded-pill px-3"
-                                               onclick="return confirm('Remove {{ pc.course.code }} from curriculum?')">
+                                               onclick="return confirm('Remove {{ pc.course.code if pc.course else 'this course' }} from curriculum?')">
                                                 <i class="fas fa-trash-alt me-1"></i>Remove
                                             </a>
                                         </td>
                                     </tr>
-                                    {% else %}
+                                    {% endfor %}
+                                {% else %}
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted py-3">
-                                            <i class="fas fa-plus-circle me-1"></i>No industrial attachment courses added
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            <i class="fas fa-briefcase me-1"></i> No industrial attachment courses added
                                         </td>
                                     </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                                {% endif %}
+                            </tbody>
+                        </table>
                     </div>
-
                 </div>
             </div>
         </div>
         {% endfor %}
+    {% else %}
+    <div class="alert alert-warning text-center py-5">
+        <i class="fas fa-exclamation-triangle fa-3x mb-3 d-block"></i>
+        <h5>No years configured for this program</h5>
+        <p>Please edit this program to set the duration years.</p>
+        <a href="{{ url_for('admin.edit_program', program_id=program.id) }}" class="btn btn-primary mt-2">
+            <i class="fas fa-edit me-2"></i>Edit Program
+        </a>
     </div>
+    {% endif %}
 
     <!-- Quick Tips Card -->
     <div class="card border-0 bg-light rounded-4 mt-4">
@@ -403,6 +421,7 @@
                         <li>Summer and Industrial Attachment courses are optional and can be enabled per program</li>
                         <li>Total credits for a standard year should typically be between 60-80 credits</li>
                         <li>Use consistent course codes (e.g., CSC101, CSC102) for easy identification</li>
+                        <li>Each year is displayed in its own card for better organization</li>
                     </ul>
                 </div>
             </div>
@@ -411,18 +430,12 @@
 </div>
 
 <style>
-    .accordion-button:not(.collapsed) {
-        background: linear-gradient(135deg, #f0f4ff, #ffffff);
-        color: #1e3c72;
-        box-shadow: none;
-    }
-    .accordion-button:focus {
-        box-shadow: none;
-        border-color: rgba(30, 60, 114, 0.2);
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     }
     .table th {
         font-weight: 600;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         color: #64748b;
@@ -434,10 +447,29 @@
     .btn-outline-danger:hover {
         background: #dc2626;
         border-color: #dc2626;
+        color: white;
+    }
+    code {
+        background: #f1f5f9;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+    }
+    .semester-section {
+        animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .card-header .rounded-circle {
+        transition: transform 0.2s ease;
+    }
+    .card-header:hover .rounded-circle {
+        transform: scale(1.05);
     }
 </style>
 
-<!-- Auto-focus on course code field -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Focus on course code input when page loads
@@ -446,17 +478,19 @@
             courseCodeInput.focus();
         }
         
-        // Optional: Show success message after adding course (if flashed)
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    if (category === 'success') {
-                        // Optional toast notification could go here
-                        console.log('{{ message }}');
-                    }
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+        // Add keyboard shortcut (Ctrl+Enter) to submit form
+        const form = document.getElementById('addCourseForm');
+        if (form) {
+            form.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    form.submit();
+                }
+            });
+        }
+        
+        // Log total courses for debugging
+        console.log('Total curriculum items:', {{ curriculum|length }});
     });
 </script>
 {% endblock %}

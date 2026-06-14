@@ -17,7 +17,7 @@ from reportlab.lib.units import inch
 from app.models import db, Student, Payment, User, RegistrationSlip
 from app.models_academics import ProgramStructure, Program, ProgramCourse, StudentRegistration, RegisteredCourse, Course
 from app.utils.helpers import allowed_file
-from app.utils.email import send_registration_email
+from app.utils.email import send_registration_email, send_registration_submission_email
 
 # Blueprint definition
 student_bp = Blueprint('student', __name__)
@@ -219,6 +219,7 @@ def upload_payment_ajax():
         print("UPLOAD PAYMENT AJAX ERROR:", e)
         return jsonify({'success': False, 'error': str(e)}), 500
 
+#----------------- Delete Payment ----------------
 @student_bp.route('/delete_payment/<int:payment_id>', methods=['POST'])
 @student_required
 def delete_payment(payment_id):
@@ -1070,18 +1071,22 @@ def get_approved_courses():
 @student_required
 def submit_registration():
     """Submit registration application for admin approval"""
+
     try:
         student_id = session.get('student_id')
         data = request.get_json()
-        
+
         program_id = data.get('program_id')
         year_level = data.get('year_level')
         semester_type_display = data.get('semester_type')
         course_ids = data.get('courses', [])
-        
+
         if not all([program_id, year_level, semester_type_display]):
-            return jsonify({'success': False, 'error': 'Missing required fields'}), 400
-        
+            return jsonify({
+                'success': False,
+                'error': 'Missing required fields'
+            }), 400
+
         # Map semester display name to semester_type
         semester_reverse_map = {
             'Semester 1': 'SEM1',
@@ -1089,8 +1094,12 @@ def submit_registration():
             'Summer Semester': 'SUMMER',
             'Industrial Attachment': 'INDUSTRIAL'
         }
-        semester_type = semester_reverse_map.get(semester_type_display, 'SEM1')
-        
+
+        semester_type = semester_reverse_map.get(
+            semester_type_display,
+            'SEM1'
+        )
+
         # Check if already submitted
         existing = StudentRegistration.query.filter_by(
             student_id=student_id,
@@ -1098,11 +1107,14 @@ def submit_registration():
             year_level=year_level,
             semester_type=semester_type
         ).first()
-        
+
         if existing:
-            return jsonify({'success': False, 'error': 'Application already submitted for this selection'}), 400
-        
-        # Create registration (pending payment approval)
+            return jsonify({
+                'success': False,
+                'error': 'Application already submitted for this selection'
+            }), 400
+
+        # Create registration
         registration = StudentRegistration(
             student_id=student_id,
             program_id=program_id,
@@ -1110,9 +1122,10 @@ def submit_registration():
             semester_type=semester_type,
             payment_status='pending'
         )
+
         db.session.add(registration)
         db.session.flush()
-        
+
         # Add selected courses
         for course_id in course_ids:
             rc = RegisteredCourse(
@@ -1120,11 +1133,49 @@ def submit_registration():
                 course_id=course_id
             )
             db.session.add(rc)
-        
+
         db.session.commit()
-        
-        return jsonify({'success': True, 'message': 'Registration application submitted successfully'})
+
+        # ==========================================
+        # SEND EMAIL (DO NOT FAIL REGISTRATION)
+        # ==========================================
+        try:
+
+            student = Student.query.get(student_id)
+
+            program = Program.query.get(program_id)
+
+            if student and program and student.email:
+
+                send_registration_submission_email(
+                    student=student,
+                    program_name=program.name,
+                    year_level=year_level,
+                    semester_name=semester_type_display,
+                    course_count=len(course_ids)
+                )
+
+        except Exception as email_error:
+
+            print(
+                f"REGISTRATION EMAIL ERROR: {email_error}"
+            )
+
+        return jsonify({
+            'success': True,
+            'message': 'Registration application submitted successfully'
+        })
+
     except Exception as e:
+
         db.session.rollback()
-        print("SUBMIT REGISTRATION ERROR:", e)
-        return jsonify({'success': False, 'error': str(e)}), 500
+
+        print(
+            "SUBMIT REGISTRATION ERROR:",
+            e
+        )
+
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500

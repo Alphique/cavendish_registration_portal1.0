@@ -89,37 +89,40 @@ def dashboard():
 # -----------------
 # Payment Management (FIXED - with StudentRegistration sync)
 # -----------------
+# -----------------
+# Payment Management (FIXED - with StudentRegistration sync)
+# -----------------
 @admin_bp.route('/payment/<int:payment_id>/<action>')
 @admin_required
 def manage_payment(payment_id, action):
-    """Approve or reject payments with full registration sync"""
-
+    """Approve or reject payments with full registration sync and email notifications"""
+    
     payment = Payment.query.get_or_404(payment_id)
-
+    student = Student.query.get(payment.student_id)
+    
     # =========================
     # APPROVE PAYMENT
     # =========================
     if action == 'approve':
         payment.status = 'approved'
         payment.approved_date = datetime.utcnow()
-
+        
         student_id = payment.student_id
-
+        
         # -------------------------------------------------
         # 1. FIND EXISTING REGISTRATION FOR THIS STUDENT
-        #    IMPORTANT: Look for pending registration first
         # -------------------------------------------------
         registration = StudentRegistration.query.filter_by(
             student_id=student_id,
             payment_status='pending'
         ).order_by(StudentRegistration.id.desc()).first()
-
+        
         # If no pending registration, check for any registration
         if not registration:
             registration = StudentRegistration.query.filter_by(
                 student_id=student_id
             ).order_by(StudentRegistration.id.desc()).first()
-
+        
         if registration:
             # UPDATE EXISTING REGISTRATION TO APPROVED
             registration.payment_status = 'approved'
@@ -127,7 +130,7 @@ def manage_payment(payment_id, action):
         else:
             # CREATE NEW REGISTRATION IF NONE EXISTS
             flash("No registration application found. Creating one automatically.", "warning")
-
+            
             registration = StudentRegistration(
                 student_id=student_id,
                 program_id=payment.student.program_id if hasattr(payment.student, "program_id") else None,
@@ -137,17 +140,19 @@ def manage_payment(payment_id, action):
             )
             db.session.add(registration)
             db.session.flush()
-
+        
         # -------------------------------------------------
         # 2. GENERATE REGISTRATION SLIP (ONLY ONCE)
         # -------------------------------------------------
         existing_slip = RegistrationSlip.query.filter_by(
             student_id=student_id
         ).first()
-
+        
+        registration_slip = None
+        
         if not existing_slip:
             slip_number = f"RS{student_id:06d}-{datetime.now().strftime('%Y%m%d')}"
-
+            
             registration_slip = RegistrationSlip(
                 slip_number=slip_number,
                 student_id=student_id,
@@ -158,45 +163,66 @@ def manage_payment(payment_id, action):
                 issue_date=datetime.utcnow(),
                 created_by=session.get('user_id', 'admin')
             )
-
+            
             db.session.add(registration_slip)
             db.session.flush()
-
+            
             # Generate PDF
             from app.utils.helpers import generate_registration_slip_pdf
             success = generate_registration_slip_pdf(registration_slip)
-
+            
             if success:
                 flash(f'Payment approved & registration completed for {payment.student.name}', 'success')
             else:
                 flash(f'Payment approved but slip PDF generation failed for {payment.student.name}', 'warning')
         else:
+            registration_slip = existing_slip
             flash(f'Payment approved for {payment.student.name}', 'success')
-
+        
         db.session.commit()
-
+        
+        # ==========================================
+        # SEND PAYMENT APPROVAL EMAIL
+        # ==========================================
+        try:
+            if student and student.email:
+                from app.utils.email import send_payment_approval_email
+                send_payment_approval_email(student, registration_slip, payment)
+        except Exception as email_error:
+            print(f"PAYMENT APPROVAL EMAIL ERROR: {email_error}")
+    
     # =========================
     # REJECT PAYMENT
     # =========================
     elif action == 'reject':
         payment.status = 'rejected'
         payment.approved_date = datetime.utcnow()
-
+        
         # Optionally update registration status if exists
         registration = StudentRegistration.query.filter_by(
             student_id=payment.student_id,
             payment_status='pending'
         ).order_by(StudentRegistration.id.desc()).first()
-
+        
         if registration:
             registration.payment_status = 'rejected'
-
+        
         db.session.commit()
         flash(f'Payment for {payment.student.name} rejected.', 'warning')
-
+        
+        # ==========================================
+        # SEND PAYMENT REJECTION EMAIL
+        # ==========================================
+        try:
+            if student and student.email:
+                from app.utils.email import send_payment_rejection_email
+                send_payment_rejection_email(student, payment, reason="Payment slip could not be verified. Please upload a clear copy.")
+        except Exception as email_error:
+            print(f"PAYMENT REJECTION EMAIL ERROR: {email_error}")
+    
     else:
         flash("Invalid action.", "danger")
-
+    
     return redirect(url_for('admin.dashboard'))
 
 # -----------------
@@ -265,6 +291,7 @@ def create_registration_slip_form():
     
     return render_template('admin/registration_slip.html')
 
+# -----------------view all registration slips with statistics-----------------
 @admin_bp.route('/view_registration_slips')
 @admin_required
 def view_registration_slips():
@@ -279,6 +306,9 @@ def view_registration_slips():
                          slips=registration_slips,
                          today_count=today_count)
 
+#-------------------------------------------------------------------------
+# ----------------- EMAIL NOTIFICATIONS (FIXED - with proper sender format and error handling)
+#-------------------------------------------------------------------------
 @admin_bp.route('/edit_registration_slip/<int:slip_id>', methods=['GET', 'POST'])
 @admin_required
 def edit_registration_slip(slip_id):
@@ -326,7 +356,7 @@ def edit_registration_slip(slip_id):
         registered_courses=registered_courses
     )
     
-    
+# ----------------- EMAIL NOTIFICATIONS (FIXED - with proper sender format and error handling) -----------------   
 @admin_bp.route('/regenerate_slip_pdf/<int:slip_id>')
 @admin_required
 def regenerate_slip_pdf(slip_id):
@@ -345,6 +375,7 @@ def regenerate_slip_pdf(slip_id):
     
     return redirect(url_for('admin.view_registration_slips'))
 
+# ----------------- EMAIL NOTIFICATIONS (FIXED - with proper sender format and error handling) -----------------
 @admin_bp.route('/delete_registration_slip/<int:slip_id>')
 @admin_required
 def delete_registration_slip(slip_id):
@@ -499,6 +530,8 @@ def create_admin():
 
     return render_template('admin/create_admin.html')
 
+#----
+#-----------------
 @admin_bp.route('/manage_admins')
 @admin_required
 def manage_admins():
